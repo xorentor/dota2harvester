@@ -20,4 +20,36 @@ libstdc++-6.dll
 
 You can grab these from your mingw bin directory if you don't trust mine.
 
+List of information you can retrive:
+- gametime
+- score radiant
+- score dire
+- gametime
+- radiant fortress hp
+- dire fortress hp
+- towers' hp
+- rax' hp
+- roshan hp
+- wards side/hp/location
+- courier side/hp/location
+All 10 players' info:
+- maxhp
+- X/Y axis on the map
+- side
+- modelname
+- hero dead seconds
+- hero ulti cd seconds
+- current hp
+- playername
+- heroid
+- assists
+- deaths
+- level
+- creeps killed
+- creeps denied
+- totalgold
+- totalexp
+- kills
+- all inventory/stash items
+
 Hopefully, this will help to create some amazing projects.
