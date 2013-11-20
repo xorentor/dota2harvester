@@ -271,35 +271,6 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 		printf( "playername: %s\n", p[ i ].playername );
 #endif		
 	}
-	
-/*
-3840 - hero id
-3868 - ?
-3960 - kill assists
-39c0 - hero deaths
-3a80 - dead player seconds
-3b40 - ?
-3ba0 - ?
-3bc8 - ? 603 always
-3c00 - hero level
-3c60 - creeps denied
-3cc0 - creeps killed
-3d20 - ?
-4218 - ?
-4338 - total player gold?
-4398 - total player exp?
-
-	int misc_heroid;
-	int misc_assists;
-	int misc_deaths;
-	int misc_dead_sec;
-	int misc_level;
-	int misc_ck;
-	int misc_cd;
-	int misc_totalgold;
-	int misc_totalexp;
-*/
-
 /*
 *	these have been changed quite often lately
 *   especially, reliable and unreliable gold figures have been moved somewhere else
@@ -412,9 +383,6 @@ static void ReadWard( HANDLE *hnd, void *addr, const int offset, const int type 
 	wards[ ward_index ].y = ReadFloat( hnd, addr, offsets, 2 );
 	wards[ ward_index ].type = type;
 	
-	//wards[ ward_index ].x = floor( wards[ ward_index ].x );
-	//wards[ ward_index ].y = floor( wards[ ward_index ].y );
-	
 	ward_index++;
 }
 
@@ -448,26 +416,8 @@ static void ReadTower( HANDLE *hnd, void *addr, const int offset, const int inde
 	towers[ index ].y = ReadFloat( hnd, addr, offsets, 2 );
 }
 
-void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer )
+static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer )
 {
-/*
-npc_dota_goodguys_range_rax_bot
-npc_dota_goodguys_melee_rax_bot
-npc_dota_goodguys_range_rax_top
-npc_dota_goodguys_melee_rax_top
-npc_dota_goodguys_range_rax_mid
-npc_dota_goodguys_melee_rax_mid
-
-npc_dota_badguys_range_rax_bot
-npc_dota_badguys_melee_rax_bot
-npc_dota_badguys_range_rax_top
-npc_dota_badguys_melee_rax_top
-npc_dota_badguys_range_rax_mid
-npc_dota_badguys_melee_rax_mid
-
-npc_dota_badguys_fort
-npc_dota_goodguys_fort
-*/			
 	if( memcmp( buffer, "npc_dota_goodguys_range_rax_bot", 31 ) == 0 ) {
 		gi.rax |= 0x1;
 		ReadRax( hnd, addr, offset, 0 );
@@ -504,25 +454,10 @@ npc_dota_goodguys_fort
 	} else if( memcmp( buffer, "npc_dota_badguys_melee_rax_mid", 30 ) == 0 ) {
 		gi.rax |= 0x800;		
 		ReadRax( hnd, addr, offset, 11 );
-		
 	} else if( memcmp( buffer, "npc_dota_goodguys_fort", 22 ) == 0 ) {
 		gi.fort |= 0x1;
 	} else if( memcmp( buffer, "npc_dota_badguys_fort", 21 ) == 0 ) {
 		gi.fort |= 0x2;
-		/*
-npc_dota_goodguys_tower4
-npc_dota_goodguys_tower4
-npc_dota_goodguys_tower3_bot
-npc_dota_goodguys_tower3_top
-npc_dota_goodguys_tower3_mid
-npc_dota_goodguys_tower2_bot
-npc_dota_goodguys_tower2_top
-npc_dota_goodguys_tower2_mid
-npc_dota_goodguys_tower1_bot
-npc_dota_goodguys_tower1_top
-npc_dota_goodguys_tower1_mid
-*/
-
 	} else if( memcmp( buffer, "npc_dota_goodguys_tower4", 24 ) == 0 && !(gi.towers & 1) ) {
 		gi.towers |= 0x1;
 		ReadTower( hnd, addr, offset, 0 );
@@ -556,20 +491,6 @@ npc_dota_goodguys_tower1_mid
 	} else if( memcmp( buffer, "npc_dota_goodguys_tower1_mid", 28 ) == 0 ) {
 		gi.towers |= 0x400;	
 		ReadTower( hnd, addr, offset, 10 );
-/*
-npc_dota_badguys_tower4
-npc_dota_badguys_tower4
-npc_dota_badguys_tower3_bot
-npc_dota_badguys_tower3_top
-npc_dota_badguys_tower3_mid
-npc_dota_badguys_tower2_bot
-npc_dota_badguys_tower2_top
-npc_dota_badguys_tower2_mid
-npc_dota_badguys_tower1_bot
-npc_dota_badguys_tower1_top
-npc_dota_badguys_tower1_mid
-*/	
-	/* there's only one name for t4 towers, lazy devs */
 	} else if( memcmp( buffer, "npc_dota_badguys_tower4", 23 ) == 0 && !(gi.towers & 0x800) ) {
 		gi.towers |= 0x800;
 		ReadTower( hnd, addr, offset, 11 );
@@ -763,14 +684,6 @@ static void ExportAll( char *gameId )
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		doWrite( &p[ i ].hero_slot, T_INT, buffer, pFile );
-		/*
-		doWrite( &p[ i ].hero_level, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_kills, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_deaths, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_assists, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_gold, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_ck, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_cd, T_INT, buffer, pFile ); */
 		doWrite( &p[ i ].hero_id, T_INT, buffer, pFile );
 		doWrite( &p[ i ].maxhp, T_INT, buffer, pFile );
 		doWrite( &p[ i ].x, T_FLOAT, buffer, pFile );
@@ -809,20 +722,14 @@ static void ExportAll( char *gameId )
 	}
 	
 	// towers
-	for( i = 0; i < 22; i++ ) {
-		//doWrite( &towers[ i ].side, T_INT, buffer, pFile );
+	for( i = 0; i < 22; i++ )
 		doWrite( &towers[ i ].hp, T_INT, buffer, pFile );
-		//doWrite( &towers[ i ].x, T_FLOAT, buffer, pFile );
-		//doWrite( &towers[ i ].y, T_FLOAT, buffer, pFile );
-	}
 	
-	for( i = 0; i < 12; i++ ) {
-		//doWrite( &rax[ i ].side, T_INT, buffer, pFile );
+	// rax
+	for( i = 0; i < 12; i++ ) 
 		doWrite( &rax[ i ].hp, T_INT, buffer, pFile );
-		//doWrite( &rax[ i ].x, T_FLOAT, buffer, pFile );
-		//doWrite( &rax[ i ].y, T_FLOAT, buffer, pFile );
-	}	
 	
+	// wards
 	for( i = 0; i < 16; i++ ) {
 		doWrite( &wards[ i ].side, T_INT, buffer, pFile );
 		doWrite( &wards[ i ].hp, T_INT, buffer, pFile );
@@ -831,6 +738,7 @@ static void ExportAll( char *gameId )
 		doWrite( &wards[ i ].type, T_INT, buffer, pFile );
 	}		
 	
+	// couriers
 	for( i = 0; i < 8; i++ ) {
 		doWrite( &couriers[ i ].side, T_INT, buffer, pFile );
 		doWrite( &couriers[ i ].hp, T_INT, buffer, pFile );
@@ -915,36 +823,21 @@ void D2H( HANDLE *hnd, void *clientdll )
 			mem_heromisc = MEM_HEROMISC; 	
 			mem_items = MEM_ITEMS; 		 
 		
-	#ifdef _DEBUG	
-			printf( "\n HERO BASIC INFO SECTION 1:\n\n" );	
-	#endif	
-			// dire score
 			offsets[ 0 ] = 3*4 + 0x27c;
 			gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-			// radiant score
 			offsets[ 0 ] = 2*4 + 0x27c;
 			gi.score_rad = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
 			offsets[ 0 ] = 0x50;
 			gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );				
-	#ifdef _DEBUG
+#ifdef _DEBUG
 			printf( "score radiant/dire: '%d' '%d'\n", gi.score_rad, gi.score_dire );	
-	#endif		
-			// read heroes
+#endif		
 			ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
 			
-	#ifdef _DEBUG
-	#endif			
-
-			gi.towers = 0;
 			
-			/*
-			* dota2 seems to mave max of 512 world entities - such a small world, even quake3 has 1024 :)
-			*/
 			for( i = 0; i < 512; i++ ) {
 				r = 0;
-	#ifdef _DEBUG
-				// get npc_dota_hero.... only
-	#endif			
+		
 				ptr = 0;
 				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
 				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
@@ -1005,8 +898,8 @@ void D2H( HANDLE *hnd, void *clientdll )
 			// they are no present in the memory unless you ask for them or I just couldn't find them
 			// 
 			// btw, to actually get the correct item id, you have to subtract the number from dump by 594 ( this number changes, just double check it )
-			// and compare it against http://dota2mobile.com/js/items.js . sneaky volvo
-			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x66 * 8 + 0x14 );	
+			// and compare it against http://dota2mobile.com/js/items.js
+			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x6C * 8 + 0x14 );	
 			
 			ExportAll( gameid );
 			

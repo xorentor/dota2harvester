@@ -21,10 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 // these change everytime dota.exe is recompiled 
 // eg. general update is done, weekly or so..
-#define MEM_HEROBASIC		0x1F4B234	
-#define MEM_HEROADV			0x1F4C0B8
-#define MEM_HEROMISC		0x1ED1334
-#define MEM_ITEMS			0x1F8204C
+#define MEM_HEROBASIC		0x206CB74	
+#define MEM_HEROADV			0x206DA28
+#define MEM_HEROMISC		0x1FF28D4
+#define MEM_ITEMS			0x20A39D8
 			
 #define		HEROES_TOTAL	104
 #define		HEROES_GAME_TOTAL 10
@@ -59,13 +59,6 @@ typedef struct Player0_s
 	int hero_dead_sec;
 	int hero_ulticd_sec;	
 	
-/*	
-	int unk2;
-	int unk3;
-	int unk4;
-	int unk5;
-	int unk6;
-*/
 	int hero_id;
 	int maxhp;
 	float x;
@@ -74,29 +67,6 @@ typedef struct Player0_s
 	char modelname[ 64 ];
 	int currenthp;
 	int duplicate;
-	
-/*
-ptr + 0x780 player0 name  
-ptr + 0x884 - player1 name ( offset next playername 0x104 )
-ptr + 0x988 - player2 name
-
-
-3840 - hero id
-3868 - ?
-3960 - kill assists
-39c0 - hero deaths
-3a80 - dead player seconds
-3b40 - ?
-3ba0 - ?
-3bc8 - ? 603 always
-3c00 - hero level
-3c60 - creeps denied
-3cc0 - creeps killed
-3d20 - ?
-4218 - ?
-4338 - total player gold?
-4398 - total player exp?
-*/
 	char playername[ 64 ];
 	int misc_heroid;
 	int misc_assists;
