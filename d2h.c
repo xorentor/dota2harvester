@@ -268,7 +268,7 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 		memcpy( p[ i ].playername, buffer, strlen( buffer ) );
 		offsets[ 0 ] += 0x104;
 #ifdef _DEBUG				
-		printf( "playername: %s\n", p[ i ].playername );
+//		printf( "playername: %s\n", p[ i ].playername );
 #endif		
 	}
 /*
@@ -329,6 +329,7 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 		
 #ifdef _DEBUG
 		printf("\n=============\n");
+		printf( "playername: %s\n", p[ i ].playername );
 		printf( "misc_heroid: '%d' '%d'\n", i, p[ i ].misc_heroid );	
 		printf( "misc_assists: '%d' '%d'\n", i, p[ i ].misc_assists );	
 		printf( "misc_deaths: '%d' '%d'\n", i, p[ i ].misc_deaths );	
@@ -539,7 +540,7 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 	memset( heroname, 0, sizeof( heroname ) );
 	memset( buffer, 0, sizeof( buffer ) );
 	offsets[ 0 ] = offset;
-	offsets[ 1 ] = 0x11a4;
+	offsets[ 1 ] = 0x11a8;
 	
 	ReadString( hnd, addr, offsets, 2, buffer );
 	
@@ -550,12 +551,14 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 				// ignore illusions
 				// **this used to work, basically you don't want to display multiple instances of the same hero,
 				// if you do, you still want to know the actual hero
+				/*
 				offsets[ 1 ] = 0x1800;	// FIXME: most likely wrong offset
 				duplicate = ReadInt( hnd, addr, offsets, 2 );	
 				if( duplicate != 0 || hero->maxhp > 0 )
 					return;
+				*/
 				
-				offsets[ 1 ] = 0x110C;	// FIXME: this is wrong
+				offsets[ 1 ] = 0x1114;	
 				hero->maxhp = ReadInt( hnd, addr, offsets, 2 );
 				offsets[ 1 ] = 0xA4;
 				hero->x = ReadFloat( hnd, addr, offsets, 2 );
@@ -575,6 +578,7 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 	}
 }
 
+// for this to work you have to keep the in-game tab 'ITEMS' open
 static void ReadItems( HANDLE *hnd, void *addr, int offset )
 {
 	int i;
@@ -823,17 +827,20 @@ void D2H( HANDLE *hnd, void *clientdll )
 			mem_heromisc = MEM_HEROMISC; 	
 			mem_items = MEM_ITEMS; 		 
 		
-			offsets[ 0 ] = 3*4 + 0x27c;
+			offsets[ 0 ] = 0x278;
 			gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-			offsets[ 0 ] = 2*4 + 0x27c;
+			offsets[ 0 ] = 0x274;
 			gi.score_rad = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
 			offsets[ 0 ] = 0x50;
-			gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );				
-#ifdef _DEBUG
-			printf( "score radiant/dire: '%d' '%d'\n", gi.score_rad, gi.score_dire );	
-#endif		
-			ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
+			gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
+
 			
+			
+#ifdef _DEBUG
+			printf( "score radiant/dire: '%d' '%d' gametime: %d\n", gi.score_rad, gi.score_dire, gi.gametime );		
+#endif		
+
+			//ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
 			
 			for( i = 0; i < 512; i++ ) {
 				r = 0;
@@ -841,7 +848,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 				ptr = 0;
 				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
 				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x11a4), buff, 32, NULL);	 
+				r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x11a8), buff, 32, NULL);	 
 
 				if( memcmp( buff, "npc_dota_hero", 13 ) == 0 ) {
 					ReadHAdv( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
@@ -874,6 +881,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			printf( "fort: '%d'\n", gi.fort );	
 			printf( "fort0hp: '%d'\n", gi.rad_fort_hp );
 			printf( "fort1hp: '%d'\n", gi.dire_fort_hp );
+			printf( "roshan hp: '%d'\n", gi.roshan_hp );
 			
 			printf( "towers:\n");
 			for( i = 0; i < 22; i++ ) {
@@ -890,7 +898,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			printf( "couriers:\n");			
 			for( i = 0; i < 8; i++ ) {	
 					printf("side: %d hp: %d x:%f y:%f\n", couriers[ i ].side, couriers[ i ].hp, couriers[ i ].x, couriers[ i ].y);
-			}							
+			}			
 #endif						
 			ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
 			
@@ -911,6 +919,16 @@ void D2H( HANDLE *hnd, void *clientdll )
 #else		
 		// testing here
 		
+		for( i = 0; i < 4096; i++ ) {
+			r = 0;
+
+			ptr = 0;
+			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + MEM_HEROADV), &ptr , 4, NULL);  
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x12a * 8), &ptr , 4, NULL); 
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), buff, 32, NULL);
+
+			printf( "T memory: %x value: %s\n", i*4, buff);
+		}
 #endif
 
 }
