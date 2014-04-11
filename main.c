@@ -48,7 +48,7 @@ BOOL GetProcessList( )
 	if( strcmp( pe32.szExeFile, "dota.exe" ) != 0 )
 		continue;
 	
-	//if( pe32.th32ProcessID != 2904 )
+	//if( pe32.th32ProcessID != 4396 )
 	//	continue;	
 	
 	printf( "\n\n=====================================================" );

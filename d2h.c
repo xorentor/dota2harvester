@@ -798,6 +798,11 @@ void D2H( HANDLE *hnd, void *clientdll )
 		char gameid[ 32 ];
 
 		baseaddr = (int *)clientdll;
+		mem_herobasic = MEM_HEROBASIC;   
+		mem_heroadv = MEM_HEROADV;   	 
+		mem_heromisc = MEM_HEROMISC; 	
+		mem_items = MEM_ITEMS; 		
+		
 #ifndef _TEST			
 		GetGameID( gameid );
 #ifndef _DEBUG		
@@ -821,11 +826,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			memset( couriers, 0, sizeof( couriers ) );
 			ward_index = 0;
 			courier_index = 0;
-			
-			mem_herobasic = MEM_HEROBASIC;   
-			mem_heroadv = MEM_HEROADV;   	 
-			mem_heromisc = MEM_HEROMISC; 	
-			mem_items = MEM_ITEMS; 		 
+					
 		
 			offsets[ 0 ] = 0x278;
 			gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
@@ -848,7 +849,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 				ptr = 0;
 				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
 				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x11a8), buff, 32, NULL);	 
+				r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x119c), buff, 32, NULL);	 
 
 				if( memcmp( buff, "npc_dota_hero", 13 ) == 0 ) {
 					ReadHAdv( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
@@ -907,7 +908,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			// 
 			// btw, to actually get the correct item id, you have to subtract the number from dump by 594 ( this number changes, just double check it )
 			// and compare it against http://dota2mobile.com/js/items.js
-			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x6C * 8 + 0x14 );	
+			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x6F * 8 + 0x14 );	
 			
 			ExportAll( gameid );
 			
@@ -923,9 +924,9 @@ void D2H( HANDLE *hnd, void *clientdll )
 			r = 0;
 
 			ptr = 0;
-			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + MEM_HEROADV), &ptr , 4, NULL);  
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x12a * 8), &ptr , 4, NULL); 
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), buff, 32, NULL);
+			r = ReadProcessMemory(*hnd, (void*)(*(int *)baseaddr + mem_heroadv), &ptr , 4, NULL);  
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x1e7 * 8), &ptr , 4, NULL); 
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), buff, 32, NULL);	
 
 			printf( "T memory: %x value: %s\n", i*4, buff);
 		}
