@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "d2h.h"
 #include "client.h"
 
-#define RtlGenRandom                    SystemFunction036
+#define NPC_DOTA_HERO		0x119c
 
 static int ward_index;
 static int courier_index;
@@ -133,7 +133,12 @@ static Hero_t heroes[ HEROES_TOTAL ] = {
 	{	"npc_dota_hero_skywrath_mage", 101 },
 	{	"npc_dota_hero_abaddon", 102 },
 	{	"npc_dota_hero_elder_titan", 103 },
-	{	"npc_dota_hero_legion_commander", 104 }
+	{	"npc_dota_hero_legion_commander", 104 },
+	{	"npc_dota_hero_ember_spirit", 106 },
+	{	"npc_dota_hero_earth_spirit", 107 },
+	{	"npc_dota_hero_abyssal_underlord", 108 },
+	{	"npc_dota_hero_terrorblade", 109 },
+	{	"npc_dota_hero_phoenix", 110 }
 };
 
 static void GetGameID( char *gameid )
@@ -191,6 +196,7 @@ static void ReadString( HANDLE *hnd, void *addr, int *ost, const int ost_num, ch
 	r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), buffer , 32, NULL); 	
 }
 
+
 static void ReadH( HANDLE *hnd, void *addr )
 {
 	int i, r;
@@ -201,7 +207,7 @@ static void ReadH( HANDLE *hnd, void *addr )
 	
 	gap = sizeof( Player0_t );
 	
-	offset = 0x0538;
+	offset = 0x0564;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		p[ i ].hero_slot = ReadInt( hnd, addr, &offset, 1 );
@@ -243,16 +249,46 @@ static void ReadH( HANDLE *hnd, void *addr )
 	}
 }
 
+
 static Player0_t *GetHeroByID( const int *id )
 {
 	int i;
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
-		if( p[ i ].hero_id == *id )
+		if( p[ i ].misc_heroid == *id )
 			return &p[ i ];
 	}		
 
 	return NULL;
 }
+
+static void ReadGold( HANDLE *hnd, void *addr, void *addr1 )
+{
+	int i;
+	int offsets[ 2 ];
+	void *ca;
+
+	offsets[ 0 ] = 0x768;
+	offsets[ 1 ] = 0x7e8;
+	
+	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {	
+		if( i < 5 ) {
+			ca = addr;
+		} else {
+			ca = addr1;
+		}
+		
+		p[ i ].misc_currentg0 = ReadInt( hnd, ca, &offsets[ 0 ], 1 );
+		offsets[ 0 ] += 4;	
+		
+		p[ i ].misc_currentg1 += ReadInt( hnd, ca, &offsets[ 1 ], 1 );	// special reward gold
+		offsets[ 1 ] += 4;
+		
+#ifdef _DEBUG	
+		printf( "misc_currentg0: '%d' '%d'\n", i, p[ i ].misc_currentg0 );	
+		printf( "misc_currentg1: '%d' '%d'\n", i, p[ i ].misc_currentg1 );	
+#endif			
+	}
+} 
 
 static void ReadMisc( HANDLE *hnd, void *addr )
 {
@@ -261,7 +297,7 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 	int offsets[ 16 ];
 	int add = 0x1180;	
 		
-	offsets[ 0 ] = 0x780;
+	offsets[ 0 ] = 0x770;
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		memset( buffer, 0, sizeof( buffer ) );
 		ReadString( hnd, addr, offsets, 1, buffer );
@@ -276,17 +312,17 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 *   especially, reliable and unreliable gold figures have been moved somewhere else
 *	and are no longer part of this structure ( someone needs to do the grunt work on these )
 */
-	offsets[ 0 ] = 0x3228; 
-	offsets[ 1 ] = 0x32f8;
-	offsets[ 2 ] = 0x3320;
-	offsets[ 3 ] = 0x3370;
-	offsets[ 4 ] = 0x34b0;
-	offsets[ 5 ] = 0x3500; 
-	offsets[ 6 ] = 0x34d8;
-	offsets[ 7 ] = 0x3a2c;
-	offsets[ 8 ] = 0x3a54;  
+	offsets[ 0 ] = 0x3218; 	// hero id
+	offsets[ 1 ] = 0x32e8;	// assists
+	offsets[ 2 ] = 0x3310;	// deaths
+	offsets[ 3 ] = 0x3360;	// dead secs
+	offsets[ 4 ] = 0x34a0;	// hero level 
+	offsets[ 5 ] = 0x34f0; 	// creeps killed
+	offsets[ 6 ] = 0x34c8;	// creeps denied
+	offsets[ 7 ] = 0x45cc; 	// total gold
+	offsets[ 8 ] = 0x45f4;  // total exp
 	offsets[ 9 ] = 0x4c80;
-	offsets[ 10 ] = 0x32d0;
+	offsets[ 10 ] = 0x32c0;	// kills
 	offsets[ 11 ] = 0x4d00;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
@@ -318,14 +354,8 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 		p[ i ].misc_totalexp = ReadInt( hnd, addr, &offsets[ 8 ], 1 );
 		offsets[ 8 ] += 4;	
 		
-		p[ i ].misc_currentg0 = ReadInt( hnd, addr, &offsets[ 9 ], 1 );
-		offsets[ 9 ] += 4;	
-
 		p[ i ].misc_kills = ReadInt( hnd, addr, &offsets[ 10 ], 1 );
 		offsets[ 10 ] += 4;	
-		
-		p[ i ].misc_currentg1 += ReadInt( hnd, addr, &offsets[ 11 ], 1 );	// special reward gold
-		offsets[ 11 ] += 4;				
 		
 #ifdef _DEBUG
 		printf("\n=============\n");
@@ -340,8 +370,7 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 		printf( "misc_totalexp: '%d' '%d'\n", i, p[ i ].misc_totalexp );	
 		printf( "misc_dead_sec: '%d' '%d'\n", i, p[ i ].misc_dead_sec );		
 		printf( "misc_kills: '%d' '%d'\n", i, p[ i ].misc_kills );	
-		printf( "misc_currentg0: '%d' '%d'\n", i, p[ i ].misc_currentg0 );	
-		printf( "misc_currentg1: '%d' '%d'\n", i, p[ i ].misc_currentg1 );	
+		
 #endif			
 	}
 }
@@ -540,11 +569,15 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 	memset( heroname, 0, sizeof( heroname ) );
 	memset( buffer, 0, sizeof( buffer ) );
 	offsets[ 0 ] = offset;
-	offsets[ 1 ] = 0x11a8;
+	offsets[ 1 ] = NPC_DOTA_HERO;
 	
 	ReadString( hnd, addr, offsets, 2, buffer );
 	
-	for( i = 0; i < HEROES_TOTAL; i++ ) {
+	for( i = 1; i <= HEROES_TOTAL; i++ ) {
+		if( i == 24 || i == 26 || i == 105 ) {
+			continue;
+		}	
+		
 		if( memcmp( buffer, heroes[ i ].name, strlen( heroes[ i ].name ) ) == 0 ) {		
 			hero = GetHeroByID( &heroes[ i ].id );
 			if( hero != NULL ) {
@@ -556,9 +589,8 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 				duplicate = ReadInt( hnd, addr, offsets, 2 );	
 				if( duplicate != 0 || hero->maxhp > 0 )
 					return;
-				*/
-				
-				offsets[ 1 ] = 0x1114;	
+				*/				
+				offsets[ 1 ] = 0x1104;	
 				hero->maxhp = ReadInt( hnd, addr, offsets, 2 );
 				offsets[ 1 ] = 0xA4;
 				hero->x = ReadFloat( hnd, addr, offsets, 2 );
@@ -574,7 +606,7 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 				printf("ReadHAdv buffer:'%s' maxhp:%d x:%f y:%f side:%d currenthp:%d duplicate: %d\n", buffer, hero->maxhp, hero->x, hero->y, hero->side, hero->currenthp, duplicate );
 #endif
 			}
-		}
+		} 
 	}
 }
 
@@ -794,6 +826,8 @@ void D2H( HANDLE *hnd, void *clientdll )
 		int mem_heroadv;
 		int mem_heromisc;
 		int mem_items;
+		int mem_herogold_r;
+		int mem_herogold_d;
 		int offset = 0;
 		char gameid[ 32 ];
 
@@ -802,6 +836,8 @@ void D2H( HANDLE *hnd, void *clientdll )
 		mem_heroadv = MEM_HEROADV;   	 
 		mem_heromisc = MEM_HEROMISC; 	
 		mem_items = MEM_ITEMS; 		
+		mem_herogold_r = MEM_HEROGOLD_R;
+		mem_herogold_d = MEM_HEROGOLD_D;
 		
 #ifndef _TEST			
 		GetGameID( gameid );
@@ -840,8 +876,8 @@ void D2H( HANDLE *hnd, void *clientdll )
 #ifdef _DEBUG
 			printf( "score radiant/dire: '%d' '%d' gametime: %d\n", gi.score_rad, gi.score_dire, gi.gametime );		
 #endif		
-
-			//ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
+			ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
+			ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
 			
 			for( i = 0; i < 512; i++ ) {
 				r = 0;
@@ -849,7 +885,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 				ptr = 0;
 				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
 				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x119c), buff, 32, NULL);	 
+				r = ReadProcessMemory(*hnd, (void*)((int)ptr + NPC_DOTA_HERO), buff, 32, NULL);	 
 
 				if( memcmp( buff, "npc_dota_hero", 13 ) == 0 ) {
 					ReadHAdv( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
@@ -876,6 +912,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 				}
 			}
 
+			
 #ifdef _DEBUG			
 			printf( "towers: '%d'\n", gi.towers );	
 			printf( "rax: '%d'\n", gi.rax );	
@@ -901,7 +938,8 @@ void D2H( HANDLE *hnd, void *clientdll )
 					printf("side: %d hp: %d x:%f y:%f\n", couriers[ i ].side, couriers[ i ].hp, couriers[ i ].x, couriers[ i ].y);
 			}			
 #endif						
-			ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
+			
+			ReadGold( hnd, (void*)(*baseaddr + mem_herogold_r), (void*)(*baseaddr + mem_herogold_d) );
 			
 			// to actually get items dump, you must keep the ingame tab called ' ITEMS ' open
 			// they are no present in the memory unless you ask for them or I just couldn't find them
@@ -920,15 +958,15 @@ void D2H( HANDLE *hnd, void *clientdll )
 #else		
 		// testing here
 		
-		for( i = 0; i < 4096; i++ ) {
+		for( i = 0; i < 8192; i++ ) {
 			r = 0;
 
 			ptr = 0;
-			r = ReadProcessMemory(*hnd, (void*)(*(int *)baseaddr + mem_heroadv), &ptr , 4, NULL);  
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0x1e7 * 8), &ptr , 4, NULL); 
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), buff, 32, NULL);	
+			r = ReadProcessMemory(*hnd, (void*)(*(int *)baseaddr + mem_herobasic), &ptr , 4, NULL);  
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), &ptr, 4, NULL); 
+			//r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), buff, 32, NULL);	
 
-			printf( "T memory: %x value: %s\n", i*4, buff);
+			printf( "T memory: %x value: %d\n", i*4, ptr);
 		}
 #endif
 
