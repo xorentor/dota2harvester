@@ -45,11 +45,11 @@ BOOL GetProcessList( )
 
   do
   {
-	if( strcmp( pe32.szExeFile, "dota.exe" ) != 0 )
-		continue;
+	//if( strcmp( pe32.szExeFile, "dota.exe" ) != 0 )
+	//	continue;
 	
-	//if( pe32.th32ProcessID != 5764 )
-	//		continue;	
+	if( pe32.th32ProcessID != 4908 )
+			continue;	
 	
 	printf( "\n\n=====================================================" );
 	printf( "\n Dota2 Harvester beta, build 04082013" );

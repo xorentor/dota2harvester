@@ -25,8 +25,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define MEM_HEROADV			0x119A494
 #define MEM_HEROMISC		0x118A4A4
 #define MEM_ITEMS			0x11D001C
-#define MEM_HEROGOLD_R		0x11B5A6C	// incorrect
-#define MEM_HEROGOLD_D		0x11B5A64	// incorrect
+#define MEM_HEROGOLD_R		0x118A49C	//	refer to stuff/gold.png
+#define MEM_HEROGOLD_D		0x118A4A0	
 			
 #define		HEROES_TOTAL	110			// highest hero id
 #define		HEROES_GAME_TOTAL 10

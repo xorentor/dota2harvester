@@ -267,8 +267,8 @@ static void ReadGold( HANDLE *hnd, void *addr, void *addr1 )
 	int offsets[ 2 ];
 	void *ca;
 
-	offsets[ 0 ] = 0x768;
-	offsets[ 1 ] = 0x7e8;
+	offsets[ 0 ] = 0x760;
+	offsets[ 1 ] = 0x760;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {	
 		if( i < 5 ) {
