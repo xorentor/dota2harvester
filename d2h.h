@@ -21,10 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 // these change everytime dota.exe is recompiled 
 // eg. general update is done, weekly or so..
-#define MEM_HEROBASIC		0x12EEA3C
-#define MEM_HEROADV			0x11E6F60
-#define MEM_HEROMISC		0x11D6F74
-#define MEM_ITEMS			0x121CAD4
+#define MEM_HEROBASIC		0x12A1934
+#define MEM_HEROADV			0x119A494
+#define MEM_HEROMISC		0x118A4A4
+#define MEM_ITEMS			0x11D001C
 #define MEM_HEROGOLD_R		0x11B5A6C	// incorrect
 #define MEM_HEROGOLD_D		0x11B5A64	// incorrect
 			

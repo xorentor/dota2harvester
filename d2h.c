@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "d2h.h"
 #include "client.h"
 
-#define NPC_DOTA_HERO		0x119c
+#define NPC_DOTA_HERO		0x1194
 
 static int ward_index;
 static int courier_index;
@@ -864,9 +864,9 @@ void D2H( HANDLE *hnd, void *clientdll )
 			courier_index = 0;
 					
 		
-			offsets[ 0 ] = 0x278;
+			offsets[ 0 ] = 0x2a4;
 			gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-			offsets[ 0 ] = 0x274;
+			offsets[ 0 ] = 0x2a0;
 			gi.score_rad = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
 			offsets[ 0 ] = 0x50;
 			gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
@@ -879,7 +879,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
 			ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
 			
-			for( i = 0; i < 512; i++ ) {
+			for( i = 0; i < 2048; i++ ) {
 				r = 0;
 		
 				ptr = 0;
@@ -946,7 +946,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			// 
 			// btw, to actually get the correct item id, you have to subtract the number from dump by 594 ( this number changes, just double check it )
 			// and compare it against http://dota2mobile.com/js/items.js
-			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x6F * 8 + 0x14 );	
+			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x72 * 8 + 0x14 );	
 			
 			ExportAll( gameid );
 			
@@ -957,16 +957,18 @@ void D2H( HANDLE *hnd, void *clientdll )
 		exit(0);
 #else		
 		// testing here
-		
-		for( i = 0; i < 8192; i++ ) {
+		int j, t;
+		for( i = 0; i < 1024; i++ ) {
 			r = 0;
 
 			ptr = 0;
-			r = ReadProcessMemory(*hnd, (void*)(*(int *)baseaddr + mem_herobasic), &ptr , 4, NULL);  
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), &ptr, 4, NULL); 
-			//r = ReadProcessMemory(*hnd, (void*)((int)ptr + i*4), buff, 32, NULL);	
-
-			printf( "T memory: %x value: %d\n", i*4, ptr);
+				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
+				for( j = 0; j < 8192; j += 4) {
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + j), buff, 32, NULL);	
+					printf( "T memory: %x value: %s\n", j, buff);
+				}
+			
 		}
 #endif
 
