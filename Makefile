@@ -1,5 +1,10 @@
 all:
-		C:\MinGW\bin\g++.exe -Wall -s *.c -o d2h.exe -lws2_32
-		
+		g++.exe -Wall -s *.c -o d2h.exe -lws2_32
+debug:
+		g++.exe -Wall -s *.c -o d2h.exe -lws2_32 -D_DEBUG
+
+test:
+		g++.exe -Wall -s *.c -o d2h.exe -lws2_32 -D_TEST
+	
 clean:
-		del d2h.exe
+		rm d2h.exe

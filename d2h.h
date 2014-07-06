@@ -21,12 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 // these change everytime dota.exe is recompiled 
 // eg. general update is done, weekly or so..
-#define MEM_HEROBASIC		0x12A1934
-#define MEM_HEROADV			0x119A494
-#define MEM_HEROMISC		0x118A4A4
-#define MEM_ITEMS			0x11D001C
-#define MEM_HEROGOLD_R		0x118A49C	//	refer to stuff/gold.png
-#define MEM_HEROGOLD_D		0x118A4A0	
+#define MEM_HEROBASIC		0x129ebdc		// 1. we did this by searching for gametime
+#define MEM_HEROADV			0x11977b4	// 0. we did this by searching for full hp
+#define MEM_HEROMISC		0x11877c4		// 2. we did this by searching for a hero lvl
+#define MEM_ITEMS			0x11CD33C
+#define MEM_HEROGOLD_R		0x11877BC	//	refer to stuff/gold.png
+#define MEM_HEROGOLD_D		0x11877C0	
 			
 #define		HEROES_TOTAL	110			// highest hero id
 #define		HEROES_GAME_TOTAL 10

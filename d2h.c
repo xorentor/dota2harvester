@@ -145,7 +145,7 @@ static void GetGameID( char *gameid )
 {
 	int random_x = 0;
 	
-	memset( gameid, 0, sizeof( *gameid ) );
+	memset( gameid, 0, sizeof( gameid ) );
 	srand( time(NULL) );
 	random_x = rand() % 0xffff + 1;
 	itoa( random_x, gameid, 10 );
@@ -153,13 +153,13 @@ static void GetGameID( char *gameid )
 
 static int ReadInt( HANDLE *hnd, void *addr, int *ost, const int ost_num )
 {
-	int i;
+	int i, r;
 	int value = 0;
 	
-	ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
+	r = ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
 	
 	for( i = 0; i < ost_num; i++ ) {
-		ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
+		r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
 	}
 		
 	return value;
@@ -167,41 +167,47 @@ static int ReadInt( HANDLE *hnd, void *addr, int *ost, const int ost_num )
 
 static float ReadFloat( HANDLE *hnd, void *addr, int *ost, const int ost_num )
 {
-	int i;
+	int i, r;
 	int value;
 	float rval;
 	
-	ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
+	r = ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
 	
 	for( i = 0; i < ( ost_num - 1 ); i++ ) {
-		ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
+		r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
 	}
 	
-	ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &rval , 4, NULL); 
+	r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &rval , 4, NULL); 
 	
 	return rval;
 }
 
 static void ReadString( HANDLE *hnd, void *addr, int *ost, const int ost_num, char *buffer )
 {
-	int i;
+	int i, r;
 	int value = 0;
 	
-	ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
+	r = ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
 	
 	for( i = 0; i < ( ost_num - 1 ); i++ ) {
-		ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
+		r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
 	}
 	
-	ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), buffer , 32, NULL); 	
+	r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), buffer , 32, NULL); 	
 }
+
 
 static void ReadH( HANDLE *hnd, void *addr )
 {
-	int i;
+	int i, r;
+	int ptr0;
+	int value;
+	int gap;
 	int offset;
 	
-	offset = 0x0564;
+	gap = sizeof( Player0_t );
+	
+	offset = 0x5e8;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		p[ i ].hero_slot = ReadInt( hnd, addr, &offset, 1 );
@@ -243,12 +249,14 @@ static void ReadH( HANDLE *hnd, void *addr )
 	}
 }
 
-static Player0_t *GetHeroByID( const int *id )
+
+static Player0_t *GetHeroByID( const int id )
 {
 	int i;
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
-		if( p[ i ].misc_heroid == *id )
+		if( p[ i ].misc_heroid == id ) {
 			return &p[ i ];
+		}
 	}		
 
 	return NULL;
@@ -288,8 +296,9 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 	int i;
 	char buffer[ 64 ];
 	int offsets[ 16 ];
-
-	offsets[ 0 ] = 0x770;
+	int add = 0x1180;	
+		
+	offsets[ 0 ] = 0x76a;
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		memset( buffer, 0, sizeof( buffer ) );
 		ReadString( hnd, addr, offsets, 1, buffer );
@@ -304,21 +313,20 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 *   especially, reliable and unreliable gold figures have been moved somewhere else
 *	and are no longer part of this structure ( someone needs to do the grunt work on these )
 */
-	offsets[ 0 ] = 0x3218; 	// hero id
+	offsets[ 0 ] = 0x3214; 	// hero id
 	offsets[ 1 ] = 0x32e8;	// assists
-	offsets[ 2 ] = 0x3310;	// deaths
-	offsets[ 3 ] = 0x3360;	// dead secs
-	offsets[ 4 ] = 0x34a0;	// hero level 
-	offsets[ 5 ] = 0x34f0; 	// creeps killed
-	offsets[ 6 ] = 0x34c8;	// creeps denied
+	offsets[ 2 ] = 0x330c;	// deaths
+	offsets[ 3 ] = 0x335c;	// dead secs
+	offsets[ 4 ] = 0x349c;	// hero level 
+	offsets[ 5 ] = 0x34ec; 	// creeps killed
+	offsets[ 6 ] = 0x34c4;	// creeps denied
 	offsets[ 7 ] = 0x45cc; 	// total gold
 	offsets[ 8 ] = 0x45f4;  // total exp
 	offsets[ 9 ] = 0x4c80;
-	offsets[ 10 ] = 0x32c0;	// kills
+	offsets[ 10 ] = 0x32bc;	// kills
 	offsets[ 11 ] = 0x4d00;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
-		
 		p[ i ].misc_heroid = ReadInt( hnd, addr, &offsets[ 0 ], 1 );
 		offsets[ 0 ] += 4;
 
@@ -367,43 +375,79 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 	}
 }
 
-#define READVARIOUS( b, i, s )\
-	int o[ 2 ];\
-	o[ 0 ] = s;\
-	o[ 1 ] = 0xf4;\
-	b[ i ].side = ReadInt( hnd, addr, o, 2 );\
-	o[ 1 ] = 0xfc;\
-	b[ i ].hp = ReadInt( hnd, addr, o, 2 );\
-	o[ 1 ] = 0xa4;\
-	b[ i ].x = ReadFloat( hnd, addr, o, 2 );\
-	o[ 1 ] = 0xa8;\
-	b[ i ].y = ReadFloat( hnd, addr, o, 2 );
-static void ReadCourier( HANDLE *hnd, void *addr, const int offset ) {
-	if( courier_index == 7 ) {
+static void ReadCourier( HANDLE *hnd, void *addr, const int offset )
+{
+	int offsets[ 2 ];
+	offsets[ 0 ] = offset;
+
+	if( courier_index == 7 )
 		return;
-	}
-	READVARIOUS( couriers, courier_index, offset );
+	
+	offsets[ 1 ] = 0xec;
+	couriers[ courier_index ].side = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xf4;
+	couriers[ courier_index ].hp = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xa8;
+	couriers[ courier_index ].x = ReadFloat( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xac;
+	couriers[ courier_index ].y = ReadFloat( hnd, addr, offsets, 2 );
+	
 	courier_index++;
 }
 
-static void ReadWard( HANDLE *hnd, void *addr, const int offset, const int type ) {
-	if( ward_index == 15 ) {
+static void ReadWard( HANDLE *hnd, void *addr, const int offset, const int type )
+{
+	int offsets[ 2 ];
+	offsets[ 0 ] = offset;
+
+	if( ward_index == 15 )
 		return;
-	}
-	READVARIOUS( wards, ward_index, offset );
+	
+	offsets[ 1 ] = 0xec;
+	wards[ ward_index ].side = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xf4;
+	wards[ ward_index ].hp = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xa8;
+	wards[ ward_index ].x = ReadFloat( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xac;
+	wards[ ward_index ].y = ReadFloat( hnd, addr, offsets, 2 );
 	wards[ ward_index ].type = type;
+	
 	ward_index++;
 }
 
-static void ReadRax( HANDLE *hnd, void *addr, const int offset, const int index ) {
-	READVARIOUS( rax, index, offset );
+static void ReadRax( HANDLE *hnd, void *addr, const int offset, const int index )
+{
+	int offsets[ 2 ];
+	offsets[ 0 ] = offset;
+
+	offsets[ 1 ] = 0xec;
+	rax[ index ].side = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xf4;
+	rax[ index ].hp = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xa8;
+	rax[ index ].x = ReadFloat( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xac;
+	rax[ index ].y = ReadFloat( hnd, addr, offsets, 2 );
 }
 
-static void ReadTower( HANDLE *hnd, void *addr, const int offset, const int index ) {
-	READVARIOUS( towers, index, offset );
+static void ReadTower( HANDLE *hnd, void *addr, const int offset, const int index )
+{
+	int offsets[ 2 ];
+	offsets[ 0 ] = offset;
+	
+	offsets[ 1 ] = 0xec;
+	towers[ index ].side = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xf4;
+	towers[ index ].hp = ReadInt( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xa8;
+	towers[ index ].x = ReadFloat( hnd, addr, offsets, 2 );
+	offsets[ 1 ] = 0xac;
+	towers[ index ].y = ReadFloat( hnd, addr, offsets, 2 );
 }
 
-static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer ) {
+static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer )
+{
 	if( memcmp( buffer, "npc_dota_goodguys_range_rax_bot", 31 ) == 0 ) {
 		gi.rax |= 0x1;
 		ReadRax( hnd, addr, offset, 0 );
@@ -414,8 +458,8 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 		gi.rax |= 0x4;
 		ReadRax( hnd, addr, offset, 2 );
 	} else if( memcmp( buffer, "npc_dota_goodguys_melee_rax_top", 31 ) == 0 ) {
-		gi.rax |= 0x8;	
-		ReadRax( hnd, addr, offset, 3 );	
+		gi.rax |= 0x8;		
+		ReadRax( hnd, addr, offset, 3 );		
 	} else if( memcmp( buffer, "npc_dota_goodguys_range_rax_mid", 31 ) == 0 ) {
 		gi.rax |= 0x10;
 		ReadRax( hnd, addr, offset, 4 );
@@ -423,22 +467,22 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 		gi.rax |= 0x20;
 		ReadRax( hnd, addr, offset, 5 );
 	} else if( memcmp( buffer, "npc_dota_badguys_range_rax_bot", 30 ) == 0 ) {
-		gi.rax |= 0x40;	
+		gi.rax |= 0x40;			
 		ReadRax( hnd, addr, offset, 6 );
 	} else if( memcmp( buffer, "npc_dota_badguys_melee_rax_bot", 30 ) == 0 ) {
-			gi.rax |= 0x80;	
+		gi.rax |= 0x80;		
 		ReadRax( hnd, addr, offset, 7 );
 	} else if( memcmp( buffer, "npc_dota_badguys_range_rax_top", 30 ) == 0 ) {
-		gi.rax |= 0x100;	
+		gi.rax |= 0x100;		
 		ReadRax( hnd, addr, offset, 8 );
 	} else if( memcmp( buffer, "npc_dota_badguys_melee_rax_top", 30 ) == 0 ) {
-		gi.rax |= 0x200;	
+		gi.rax |= 0x200;		
 		ReadRax( hnd, addr, offset, 9 );
 	} else if( memcmp( buffer, "npc_dota_badguys_range_rax_mid", 30 ) == 0 ) {
-		gi.rax |= 0x400;	
+		gi.rax |= 0x400;		
 		ReadRax( hnd, addr, offset, 10 );
 	} else if( memcmp( buffer, "npc_dota_badguys_melee_rax_mid", 30 ) == 0 ) {
-		gi.rax |= 0x800;	
+		gi.rax |= 0x800;		
 		ReadRax( hnd, addr, offset, 11 );
 	} else if( memcmp( buffer, "npc_dota_goodguys_fort", 22 ) == 0 ) {
 		gi.fort |= 0x1;
@@ -447,14 +491,14 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 	} else if( memcmp( buffer, "npc_dota_goodguys_tower4", 24 ) == 0 && !(gi.towers & 1) ) {
 		gi.towers |= 0x1;
 		ReadTower( hnd, addr, offset, 0 );
-	} else if( memcmp( buffer, "npc_dota_goodguys_tower4", 24 ) == 0 ) {
+	} else if( memcmp( buffer, "npc_dota_goodguys_tower4", 24 ) == 0 ) { 
 		gi.towers |= 0x2;
 		ReadTower( hnd, addr, offset, 1 );
 	} else if( memcmp( buffer, "npc_dota_goodguys_tower3_bot", 28 ) == 0 ) {
 		gi.towers |= 0x4;
 		ReadTower( hnd, addr, offset, 2 );
 	} else if( memcmp( buffer, "npc_dota_goodguys_tower3_top", 28 ) == 0 ) {
-		gi.towers |= 0x8;	
+		gi.towers |= 0x8;			
 		ReadTower( hnd, addr, offset, 3 );
 	} else if( memcmp( buffer, "npc_dota_goodguys_tower3_mid", 28 ) == 0 ) {
 		gi.towers |= 0x10;	
@@ -484,10 +528,10 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 		gi.towers |= 0x1000;
 		ReadTower( hnd, addr, offset, 12 );
 	} else if( memcmp( buffer, "npc_dota_badguys_tower3_bot", 27 ) == 0 ) {
-		gi.towers |= 0x2000;	
+		gi.towers |= 0x2000;			
 		ReadTower( hnd, addr, offset, 13 );
 	} else if( memcmp( buffer, "npc_dota_badguys_tower3_top", 27 ) == 0 ) {
-		gi.towers |= 0x4000;	
+		gi.towers |= 0x4000;		
 		ReadTower( hnd, addr, offset, 14 );
 	} else if( memcmp( buffer, "npc_dota_badguys_tower3_mid", 27 ) == 0 ) {
 		gi.towers |= 0x8000;	
@@ -499,7 +543,7 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 		gi.towers |= 0x20000;	
 		ReadTower( hnd, addr, offset, 17 );
 	} else if( memcmp( buffer, "npc_dota_badguys_tower2_mid", 27 ) == 0 ) {
-		gi.towers |= 0x40000;	
+		gi.towers |= 0x40000;				
 		ReadTower( hnd, addr, offset, 18 );
 	} else if( memcmp( buffer, "npc_dota_badguys_tower1_bot", 27 ) == 0 ) {
 		gi.towers |= 0x80000;	
@@ -508,13 +552,14 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 		gi.towers |= 0x100000;	
 		ReadTower( hnd, addr, offset, 20 );
 	} else if( memcmp( buffer, "npc_dota_badguys_tower1_mid", 27 ) == 0 ) {
-		gi.towers |= 0x200000;	
+		gi.towers |= 0x200000;				
 		ReadTower( hnd, addr, offset, 21 );
 	}
 }
 
-static void ReadHAdv( HANDLE *hnd, void *addr, const int offset ) {
-	int i;
+static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
+{
+	int i, j;
 	int offsets[ 2 ];
 	char buffer[ 64 ];
 	char heroname[ 64 ];
@@ -529,12 +574,12 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset ) {
 	ReadString( hnd, addr, offsets, 2, buffer );
 	
 	for( i = 1; i <= HEROES_TOTAL; i++ ) {
-		if( i == 24 || i == 26 || i == 105 ) {	// empty indexes
+		if( i == 24 || i == 26 || i == 105 ) {
 			continue;
 		}	
 		
 		if( memcmp( buffer, heroes[ i ].name, strlen( heroes[ i ].name ) ) == 0 ) {		
-			hero = GetHeroByID( &heroes[ i ].id );
+			hero = GetHeroByID( heroes[ i ].id );
 			if( hero != NULL ) {
 				// ignore illusions
 				// **this used to work, basically you don't want to display multiple instances of the same hero,
@@ -545,20 +590,20 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset ) {
 				if( duplicate != 0 || hero->maxhp > 0 )
 					return;
 				*/				
-				offsets[ 1 ] = 0x1104;	
+				offsets[ 1 ] = 0x10fc;	
 				hero->maxhp = ReadInt( hnd, addr, offsets, 2 );
-				offsets[ 1 ] = 0xA4;
-				hero->x = ReadFloat( hnd, addr, offsets, 2 );
 				offsets[ 1 ] = 0xA8;
+				hero->x = ReadFloat( hnd, addr, offsets, 2 );
+				offsets[ 1 ] = 0xAC;
 				hero->y = ReadFloat( hnd, addr, offsets, 2 );
-				offsets[ 1 ] = 0xF4;
+				offsets[ 1 ] = 0xEC;
 				hero->side = ReadInt( hnd, addr, offsets, 2 );
-				offsets[ 1 ] = 0xFC;
+				offsets[ 1 ] = 0xF4;
 				hero->currenthp = ReadInt( hnd, addr, offsets, 2 );		
 				hero->duplicate = duplicate;
 				memcpy( hero->modelname, heroes[ i ].name, strlen( heroes[ i ].name ) );
 #ifdef _DEBUG				
-				printf("ReadHAdv buffer:'%s' maxhp:%d x:%f y:%f side:%d currenthp:%d duplicate: %d\n", buffer, hero->maxhp, hero->x, hero->y, hero->side, hero->currenthp, duplicate );
+				printf("ReadHAdv buffer:'%s' maxhp:%d x:%f y:%f side:%d currenthp:%d duplicate: %d offset: %x\n", buffer, hero->maxhp, hero->x, hero->y, hero->side, hero->currenthp, duplicate, offset );
 #endif
 			}
 		} 
@@ -566,11 +611,14 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset ) {
 }
 
 // for this to work you have to keep the in-game tab 'ITEMS' open
-static void ReadItems( HANDLE *hnd, void *addr, int offset ) {
+static void ReadItems( HANDLE *hnd, void *addr, int offset )
+{
 	int i;
 	int offsets[ 2 ];
 
 	offsets[ 0 ] = offset;
+	
+	int test = 0;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		offsets[ 1 ] = i * 0x40 + 0x3c;
@@ -614,33 +662,32 @@ static void ReadItems( HANDLE *hnd, void *addr, int offset ) {
 	}	
 }
 
-static void doWrite( void *var, const int type, char *buffer, FILE *f ) {
+static void doWrite( void *var, const int type, char *buffer, FILE *f )
+{
 	int *x;
 	float *y;
 	char *z;
-	unsigned int len = strlen( buffer );
-	
-	if( len >= sizeof( *buffer ) ) {
-		return;
-	}	
-	memset( buffer, 0, sizeof( *buffer ) );
 	
 	if( type == T_INT ) {
-		x = (int *)var;		
+		x = (int *)var;
+		memset( buffer, 0, sizeof( buffer ) );
 		sprintf( buffer, "%d\n", *x );
-		fwrite( buffer, 1, len, f );
+		fwrite( buffer, 1, strlen( buffer ), f );
 	} else if( type == T_FLOAT ) {
 		y = (float *)var;
+		memset( buffer, 0, sizeof( buffer ) );
 		sprintf( buffer, "%f\n", *y );
-		fwrite( buffer, 1, len, f );
+		fwrite( buffer, 1, strlen( buffer ), f );
 	} else if( type == T_STRING ) {
 		z = (char *)var;
+		memset( buffer, 0, sizeof( buffer ) );
 		sprintf( buffer, "%s\n", z );
-		fwrite( buffer, 1, len, f );
+		fwrite( buffer, 1, strlen( buffer ), f );
 	}
 }
 
-static void ExportAll( char *gameId ) {
+static void ExportAll( char *gameId )
+{
 	FILE *pFile;
 	char buffer[ 64 ];
 	char *outputbuff;
@@ -648,12 +695,13 @@ static void ExportAll( char *gameId ) {
 	int i;
 	const char *tmp = "gamedata";	
 	char bufferf[ 128 ];
+	size_t result;
 		
 	memset( bufferf, 0, sizeof( bufferf ) );	
 		
 	pFile = fopen( tmp, "w" );
 	if( pFile == NULL ) {
-		printf("file error %s %d\n", __FILE__, __LINE__);
+		printf("file error %s %s\n", __FILE__, __LINE__);
 	}
 	fseek( pFile, 0, SEEK_END );
 	
@@ -671,14 +719,14 @@ static void ExportAll( char *gameId ) {
 	doWrite( &gi.dire_fort_hp, T_INT, buffer, pFile );
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
-		doWrite( &p[ i ].hero_slot, T_INT, buffer, pFile );
-		doWrite( &p[ i ].hero_id, T_INT, buffer, pFile );
+		doWrite( &i, T_INT, buffer, pFile );
+		doWrite( &p[ i ].misc_heroid, T_INT, buffer, pFile );
 		doWrite( &p[ i ].maxhp, T_INT, buffer, pFile );
 		doWrite( &p[ i ].x, T_FLOAT, buffer, pFile );
 		doWrite( &p[ i ].y, T_FLOAT, buffer, pFile );
 		doWrite( &p[ i ].side, T_INT, buffer, pFile );
 		doWrite( &p[ i ].modelname, T_STRING, buffer, pFile );
-		doWrite( &p[ i ].hero_dead_sec, T_INT, buffer, pFile );
+		doWrite( &p[ i ].misc_dead_sec, T_INT, buffer, pFile );
 		doWrite( &p[ i ].hero_ulticd_sec, T_INT, buffer, pFile );
 		doWrite( &p[ i ].currenthp, T_INT, buffer, pFile );
 		doWrite( &p[ i ].playername, T_STRING, buffer, pFile );
@@ -744,7 +792,7 @@ static void ExportAll( char *gameId ) {
 	
 	outputbuff = (char *)malloc( sizeof(char) * lSize + sizeof(int) );
 	*(int *)outputbuff = lSize;
-	fread( outputbuff + sizeof(int), 1, lSize, pFile );
+	result = fread( outputbuff + sizeof(int), 1, lSize, pFile );
 	
 	for( i = 0; i < lSize; i++ ) {
 		if( outputbuff[ i ] == 13 )	
@@ -759,155 +807,177 @@ static void ExportAll( char *gameId ) {
 	free( outputbuff );
 }
 
-void D2H( HANDLE *hnd, void *clientdll ) {
-	int ptr = 0;
-	char buff[ 32 ];
-	int i;
-	int *baseaddr;	
+void D2H( HANDLE *hnd, void *clientdll )
+{
+		int ptr = 0;
+		char buff[ 32 ], buff1[ 32 ];
+		int *baseaddr;
+		
+		int i;
+		//int value;
+		int maxhp;
+		int score_dire;
+		int r;
+		int unknVal = 0;
+		//int q;
+		
+		int offsets[ 16 ];
+		int mem_herobasic;
+		int mem_heroadv;
+		int mem_heromisc;
+		int mem_items;
+		int mem_herogold_r;
+		int mem_herogold_d;
+		int offset = 0;
+		char gameid[ 32 ];
 
-	int offsets[ 16 ];
-	int mem_herobasic;
-	int mem_heroadv;
-	int mem_heromisc;
-	int mem_items;
-	int mem_herogold_r;
-	int mem_herogold_d;
-	char gameid[ 32 ];
+		baseaddr = (int *)clientdll;
+		mem_herobasic = MEM_HEROBASIC;   
+		mem_heroadv = MEM_HEROADV;   	 
+		mem_heromisc = MEM_HEROMISC; 	
+		mem_items = MEM_ITEMS; 		
+		mem_herogold_r = MEM_HEROGOLD_R;
+		mem_herogold_d = MEM_HEROGOLD_D;
 
-	baseaddr = (int *)clientdll;
-	mem_herobasic = MEM_HEROBASIC;   
-	mem_heroadv = MEM_HEROADV;   	 
-	mem_heromisc = MEM_HEROMISC; 	
-	mem_items = MEM_ITEMS; 		
-	mem_herogold_r = MEM_HEROGOLD_R;
-	mem_herogold_d = MEM_HEROGOLD_D;
-	printf( "base addr %x\n", *baseaddr );
 #ifndef _TEST			
-	GetGameID( gameid );
+		GetGameID( gameid );
 #ifndef _DEBUG		
-	if( initClient() != 0 ) {
-		exit(0);
-	}
+		if( initClient() != 0 )
+			exit(0);
 #endif		
 
 		
 #ifndef _DEBUG		
-	while( 1==1 ) {
+		while( 1==1 ) {
 #else
-	{
+		{
 #endif		
-		memset( buff, 0, sizeof( buff ) );
-		memset( p, 0, sizeof( p ) );
-		memset( &gi, 0, sizeof( gi ) );
-		memset( wards, 0, sizeof( wards ) );
-		memset( towers, 0, sizeof( towers ) );
-		memset( rax, 0, sizeof( rax ) );
-		memset( couriers, 0, sizeof( couriers ) );
-		ward_index = 0;
-		courier_index = 0;					
-	
-		offsets[ 0 ] = 0x2a4;
-		gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-		offsets[ 0 ] = 0x2a0;
-		gi.score_rad = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-		offsets[ 0 ] = 0x50;
-		gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
+			memset( buff, 0, sizeof( buff ) );
+			memset( buff1, 0, sizeof( buff1 ) );
+			memset( p, 0, sizeof( p ) );
+			memset( &gi, 0, sizeof( gi ) );
+			memset( wards, 0, sizeof( wards ) );
+			memset( towers, 0, sizeof( towers ) );
+			memset( rax, 0, sizeof( rax ) );
+			memset( couriers, 0, sizeof( couriers ) );
+			ward_index = 0;
+			courier_index = 0;
+					
+		
+			offsets[ 0 ] = 0x2fc;
+			gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
+			offsets[ 0 ] = 0x2f8;
+			gi.score_rad = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
+			offsets[ 0 ] = 0x50;
+			gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
 
-		
-		
+			
+			
 #ifdef _DEBUG
-		printf( "score radiant/dire: '%d' '%d' gametime: %d\n", gi.score_rad, gi.score_dire, gi.gametime );		
+			printf( "score radiant/dire: '%d' '%d' gametime: %d\n", gi.score_rad, gi.score_dire, gi.gametime );		
 #endif		
-		ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
-		ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
+			ReadH( hnd, (void*)(*baseaddr + mem_herobasic) );
+			ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
+			
+			for( i = 0; i < 2048; i++ ) {
+				r = 0;
 		
-		for( i = 0; i < 2048; i++ ) {
-	
-			ptr = 0;
-			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-			ReadProcessMemory(*hnd, (void*)((int)ptr + NPC_DOTA_HERO), buff, 32, NULL);	 
+				ptr = 0;
+				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+				r = ReadProcessMemory(*hnd, (void*)((int)ptr + NPC_DOTA_HERO), buff, 32, NULL);	 
 
-			if( memcmp( buff, "npc_dota_hero", 13 ) == 0 ) {
-				ReadHAdv( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
-			} else if( memcmp( buff, "npc_dota_roshan", 15 ) == 0 ) { 
-				ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-				ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				ReadProcessMemory(*hnd, (void*)((int)ptr + 0xfc), &gi.roshan_hp, 4, NULL);						
-			} else if( memcmp( buff, "npc_dota_goodguys_fort", 22 ) == 0 ) { 
-				ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-				ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				ReadProcessMemory(*hnd, (void*)((int)ptr + 0xfc), &gi.rad_fort_hp, 4, NULL);	
-			} else if( memcmp( buff, "npc_dota_badguys_fort", 21 ) == 0 ) {
-				ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-				ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				ReadProcessMemory(*hnd, (void*)((int)ptr + 0xfc), &gi.dire_fort_hp, 4, NULL);	
-			} else if( memcmp( buff, "npc_dota_observer_wards", 23 ) == 0 ) {
-				ReadWard( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, 1 );
-			} else if( memcmp( buff, "npc_dota_sentry_wards", 21 ) == 0 ) {					
-				ReadWard( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, 2 );
-			} else if( memcmp( buff, "npc_dota_courier", 16 ) == 0 ) {					
-				ReadCourier( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
-			} else {
-				ReadAncients( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, buff );
+				if( memcmp( buff, "npc_dota_hero", 13 ) == 0 ) {
+					ReadHAdv( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
+				} else if( memcmp( buff, "npc_dota_roshan", 15 ) == 0 ) { 
+					r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.roshan_hp, 4, NULL);						
+				} else if( memcmp( buff, "npc_dota_goodguys_fort", 22 ) == 0 ) { 
+					r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.rad_fort_hp, 4, NULL);	
+				} else if( memcmp( buff, "npc_dota_badguys_fort", 21 ) == 0 ) {
+					r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+					r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.dire_fort_hp, 4, NULL);	
+				} else if( memcmp( buff, "npc_dota_observer_wards", 23 ) == 0 ) {
+					ReadWard( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, 1 );
+				} else if( memcmp( buff, "npc_dota_sentry_wards", 21 ) == 0 ) {					
+					ReadWard( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, 2 );
+				} else if( memcmp( buff, "npc_dota_courier", 16 ) == 0 ) {					
+					ReadCourier( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
+				} else {
+					ReadAncients( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, buff );
+				}
 			}
-		}
 
 			
 #ifdef _DEBUG			
-		printf( "towers: '%d'\n", gi.towers );	
-		printf( "rax: '%d'\n", gi.rax );	
-		printf( "fort: '%d'\n", gi.fort );	
-		printf( "fort0hp: '%d'\n", gi.rad_fort_hp );
-		printf( "fort1hp: '%d'\n", gi.dire_fort_hp );
-		printf( "roshan hp: '%d'\n", gi.roshan_hp );
-		
-		printf( "towers:\n");
-		for( i = 0; i < 22; i++ ) {
-				printf("side: %d hp: %d x:%f y:%f\n", towers[ i ].side, towers[ i ].hp, towers[ i ].x, towers[ i ].y);
-		}
-		printf( "rax:\n");
-		for( i = 0; i < 12; i++ ) {
-				printf("side: %d hp: %d x:%f y:%f\n", rax[ i ].side, rax[ i ].hp, rax[ i ].x, rax[ i ].y);
-		}			
-		printf( "wards:\n");
-		for( i = 0; i < 16; i++ ) {
-				printf("side: %d hp: %d x:%f y:%f\n", wards[ i ].side, wards[ i ].hp, wards[ i ].x, wards[ i ].y);
-		}				
-		printf( "couriers:\n");			
-		for( i = 0; i < 8; i++ ) {	
-				printf("side: %d hp: %d x:%f y:%f\n", couriers[ i ].side, couriers[ i ].hp, couriers[ i ].x, couriers[ i ].y);
-		}			
+			printf( "towers: '%d'\n", gi.towers );	
+			printf( "rax: '%d'\n", gi.rax );	
+			printf( "fort: '%d'\n", gi.fort );	
+			printf( "fort0hp: '%d'\n", gi.rad_fort_hp );
+			printf( "fort1hp: '%d'\n", gi.dire_fort_hp );
+			printf( "roshan hp: '%d'\n", gi.roshan_hp );
+			
+			printf( "towers:\n");
+			for( i = 0; i < 22; i++ ) {
+					printf("side: %d hp: %d x:%f y:%f\n", towers[ i ].side, towers[ i ].hp, towers[ i ].x, towers[ i ].y);
+			}
+			printf( "rax:\n");
+			for( i = 0; i < 12; i++ ) {
+					printf("side: %d hp: %d x:%f y:%f\n", rax[ i ].side, rax[ i ].hp, rax[ i ].x, rax[ i ].y);
+			}			
+			printf( "wards:\n");
+			for( i = 0; i < 16; i++ ) {
+					printf("side: %d hp: %d x:%f y:%f\n", wards[ i ].side, wards[ i ].hp, wards[ i ].x, wards[ i ].y);
+			}				
+			printf( "couriers:\n");			
+			for( i = 0; i < 8; i++ ) {	
+					printf("side: %d hp: %d x:%f y:%f\n", couriers[ i ].side, couriers[ i ].hp, couriers[ i ].x, couriers[ i ].y);
+			}			
 #endif						
 			
-		ReadGold( hnd, (void*)(*baseaddr + mem_herogold_r), (void*)(*baseaddr + mem_herogold_d) );
+			ReadGold( hnd, (void*)(*baseaddr + mem_herogold_r), (void*)(*baseaddr + mem_herogold_d) );
+			
+			// to actually get items dump, you must keep the ingame tab called ' ITEMS ' open
+			// they are no present in the memory unless you ask for them or I just couldn't find them
+			// 
+			// to get the correct item id, you have to subtract the number from dump by 637 ( this number changes, just double check it )
+			// and compare it against http://dota2mobile.com/js/items.js
+			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x72 * 8 + 0x14 );
+			
+			ExportAll( gameid );
+			
+			Sleep( 500 );	// .5s
+		} 
 		
-		// to get items dump, you must keep the ingame tab called ' ITEMS ' open
-		// they are no present in the memory unless you ask for them or I just couldn't find them
-		ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x72 * 8 + 0x14 );	
-		
-		ExportAll( gameid );
-		
-		Sleep( 500 );	// .5s
-	} 
-		
-	closeClient();
-	exit(0);
+		closeClient();
+		exit(0);
 #else		
-	// testing here
-	int j, t;
-	for( i = 0; i < 1024; i++ ) {
-		r = 0;
-
-		ptr = 0;
-			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+		// testing here
+		/*
+		for( i = 0; i < 16384; i++ ) {
+			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heromisc), &ptr , 4, NULL);  
 			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
-			for( j = 0; j < 8192; j += 4) {
-				r = ReadProcessMemory(*hnd, (void*)((int)ptr + j), buff, 32, NULL);	
-				printf( "T memory: %x value: %s\n", j, buff);
-			}
-		
-	}
+			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
+		}
+		*/
+		for( i = 0; i < 16384; i++ ) {
+			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_herobasic), &ptr , 4, NULL);  
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
+			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
+		}
+			
+		/*
+		for( i = 0; i < 16384; i++ ) {		
+			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf40), &ptr , 4, NULL);
+			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL);			
+			printf( "T memory: %x value: %d\n", i*4, ptr);
+		} */
+				
 #endif
 
 }
