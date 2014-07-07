@@ -54,7 +54,7 @@ BOOL GetProcessList( )
 	printf( "\n\n=====================================================" );
 	printf( "\n Dota2 Harvester beta, build 04082013" );
 	printf( "\n=====================================================\n" );
-	printf( "\n  Process ID        = 0x%08X\n", pe32.th32ProcessID );
+	printf( "\n  Process ID        = 0x%08X\n", (unsigned int)pe32.th32ProcessID );
 
     // Retrieve the priority class.
     //dwPriorityClass = 0;

@@ -145,7 +145,7 @@ static void GetGameID( char *gameid )
 {
 	int random_x = 0;
 	
-	memset( gameid, 0, sizeof( gameid ) );
+	memset( gameid, 0, sizeof( *gameid ) );
 	srand( time(NULL) );
 	random_x = rand() % 0xffff + 1;
 	itoa( random_x, gameid, 10 );
@@ -153,13 +153,13 @@ static void GetGameID( char *gameid )
 
 static int ReadInt( HANDLE *hnd, void *addr, int *ost, const int ost_num )
 {
-	int i, r;
+	int i;
 	int value = 0;
 	
-	r = ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
+	ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
 	
 	for( i = 0; i < ost_num; i++ ) {
-		r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
+		ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
 	}
 		
 	return value;
@@ -167,45 +167,40 @@ static int ReadInt( HANDLE *hnd, void *addr, int *ost, const int ost_num )
 
 static float ReadFloat( HANDLE *hnd, void *addr, int *ost, const int ost_num )
 {
-	int i, r;
+	int i;
 	int value;
 	float rval;
 	
-	r = ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
+	ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
 	
 	for( i = 0; i < ( ost_num - 1 ); i++ ) {
-		r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
+		ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
 	}
 	
-	r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &rval , 4, NULL); 
+	ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &rval , 4, NULL); 
 	
 	return rval;
 }
 
 static void ReadString( HANDLE *hnd, void *addr, int *ost, const int ost_num, char *buffer )
 {
-	int i, r;
+	int i;
 	int value = 0;
 	
-	r = ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
+	ReadProcessMemory( *hnd, addr, &value, 4, NULL); 
 	
 	for( i = 0; i < ( ost_num - 1 ); i++ ) {
-		r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
+		ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), &value , 4, NULL); 
 	}
 	
-	r = ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), buffer , 32, NULL); 	
+	ReadProcessMemory( *hnd, (void *)((int )value + ost[ i ]), buffer , 32, NULL); 	
 }
 
 
 static void ReadH( HANDLE *hnd, void *addr )
 {
-	int i, r;
-	int ptr0;
-	int value;
-	int gap;
+	int i;
 	int offset;
-	
-	gap = sizeof( Player0_t );
 	
 	offset = 0x5e8;
 	
@@ -296,7 +291,6 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 	int i;
 	char buffer[ 64 ];
 	int offsets[ 16 ];
-	int add = 0x1180;	
 		
 	offsets[ 0 ] = 0x76a;
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
@@ -374,76 +368,40 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 #endif			
 	}
 }
-
-static void ReadCourier( HANDLE *hnd, void *addr, const int offset )
-{
-	int offsets[ 2 ];
-	offsets[ 0 ] = offset;
-
-	if( courier_index == 7 )
+#define READVARIOUS( b, i, s )\
+	int o[ 2 ];\
+	o[ 0 ] = s;\
+	o[ 1 ] = 0xec;\
+	b[ i ].side = ReadInt( hnd, addr, o, 2 );\
+	o[ 1 ] = 0xf4;\
+	b[ i ].hp = ReadInt( hnd, addr, o, 2 );\
+	o[ 1 ] = 0xa8;\
+	b[ i ].x = ReadFloat( hnd, addr, o, 2 );\
+	o[ 1 ] = 0xac;\
+	b[ i ].y = ReadFloat( hnd, addr, o, 2 );
+static void ReadCourier( HANDLE *hnd, void *addr, const int offset ) {
+	if( courier_index == 7 ) {
 		return;
-	
-	offsets[ 1 ] = 0xec;
-	couriers[ courier_index ].side = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xf4;
-	couriers[ courier_index ].hp = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xa8;
-	couriers[ courier_index ].x = ReadFloat( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xac;
-	couriers[ courier_index ].y = ReadFloat( hnd, addr, offsets, 2 );
-	
+	}
+	READVARIOUS( couriers, courier_index, offset );
 	courier_index++;
 }
 
-static void ReadWard( HANDLE *hnd, void *addr, const int offset, const int type )
-{
-	int offsets[ 2 ];
-	offsets[ 0 ] = offset;
-
-	if( ward_index == 15 )
+static void ReadWard( HANDLE *hnd, void *addr, const int offset, const int type ) {
+	if( ward_index == 15 ) {
 		return;
-	
-	offsets[ 1 ] = 0xec;
-	wards[ ward_index ].side = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xf4;
-	wards[ ward_index ].hp = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xa8;
-	wards[ ward_index ].x = ReadFloat( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xac;
-	wards[ ward_index ].y = ReadFloat( hnd, addr, offsets, 2 );
+	}
+	READVARIOUS( wards, ward_index, offset );
 	wards[ ward_index ].type = type;
-	
 	ward_index++;
 }
 
-static void ReadRax( HANDLE *hnd, void *addr, const int offset, const int index )
-{
-	int offsets[ 2 ];
-	offsets[ 0 ] = offset;
-
-	offsets[ 1 ] = 0xec;
-	rax[ index ].side = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xf4;
-	rax[ index ].hp = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xa8;
-	rax[ index ].x = ReadFloat( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xac;
-	rax[ index ].y = ReadFloat( hnd, addr, offsets, 2 );
+static void ReadRax( HANDLE *hnd, void *addr, const int offset, const int index ) {
+	READVARIOUS( rax, index, offset );
 }
 
-static void ReadTower( HANDLE *hnd, void *addr, const int offset, const int index )
-{
-	int offsets[ 2 ];
-	offsets[ 0 ] = offset;
-	
-	offsets[ 1 ] = 0xec;
-	towers[ index ].side = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xf4;
-	towers[ index ].hp = ReadInt( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xa8;
-	towers[ index ].x = ReadFloat( hnd, addr, offsets, 2 );
-	offsets[ 1 ] = 0xac;
-	towers[ index ].y = ReadFloat( hnd, addr, offsets, 2 );
+static void ReadTower( HANDLE *hnd, void *addr, const int offset, const int index ) {
+	READVARIOUS( towers, index, offset );
 }
 
 static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer )
@@ -559,7 +517,7 @@ static void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffe
 
 static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 {
-	int i, j;
+	int i;
 	int offsets[ 2 ];
 	char buffer[ 64 ];
 	char heroname[ 64 ];
@@ -618,8 +576,6 @@ static void ReadItems( HANDLE *hnd, void *addr, int offset )
 
 	offsets[ 0 ] = offset;
 	
-	int test = 0;
-	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
 		offsets[ 1 ] = i * 0x40 + 0x3c;
 		p[ i ].i0 = ReadInt( hnd, addr, offsets, 2 );	
@@ -670,17 +626,17 @@ static void doWrite( void *var, const int type, char *buffer, FILE *f )
 	
 	if( type == T_INT ) {
 		x = (int *)var;
-		memset( buffer, 0, sizeof( buffer ) );
+		memset( buffer, 0, sizeof( *buffer ) );
 		sprintf( buffer, "%d\n", *x );
 		fwrite( buffer, 1, strlen( buffer ), f );
 	} else if( type == T_FLOAT ) {
 		y = (float *)var;
-		memset( buffer, 0, sizeof( buffer ) );
+		memset( buffer, 0, sizeof( *buffer ) );
 		sprintf( buffer, "%f\n", *y );
 		fwrite( buffer, 1, strlen( buffer ), f );
 	} else if( type == T_STRING ) {
 		z = (char *)var;
-		memset( buffer, 0, sizeof( buffer ) );
+		memset( buffer, 0, sizeof( *buffer ) );
 		sprintf( buffer, "%s\n", z );
 		fwrite( buffer, 1, strlen( buffer ), f );
 	}
@@ -695,13 +651,12 @@ static void ExportAll( char *gameId )
 	int i;
 	const char *tmp = "gamedata";	
 	char bufferf[ 128 ];
-	size_t result;
 		
 	memset( bufferf, 0, sizeof( bufferf ) );	
 		
 	pFile = fopen( tmp, "w" );
 	if( pFile == NULL ) {
-		printf("file error %s %s\n", __FILE__, __LINE__);
+		printf("file error\n");
 	}
 	fseek( pFile, 0, SEEK_END );
 	
@@ -792,7 +747,7 @@ static void ExportAll( char *gameId )
 	
 	outputbuff = (char *)malloc( sizeof(char) * lSize + sizeof(int) );
 	*(int *)outputbuff = lSize;
-	result = fread( outputbuff + sizeof(int), 1, lSize, pFile );
+	fread( outputbuff + sizeof(int), 1, lSize, pFile );
 	
 	for( i = 0; i < lSize; i++ ) {
 		if( outputbuff[ i ] == 13 )	
@@ -812,15 +767,8 @@ void D2H( HANDLE *hnd, void *clientdll )
 		int ptr = 0;
 		char buff[ 32 ], buff1[ 32 ];
 		int *baseaddr;
-		
 		int i;
-		//int value;
-		int maxhp;
-		int score_dire;
-		int r;
-		int unknVal = 0;
-		//int q;
-		
+
 		int offsets[ 16 ];
 		int mem_herobasic;
 		int mem_heroadv;
@@ -828,7 +776,6 @@ void D2H( HANDLE *hnd, void *clientdll )
 		int mem_items;
 		int mem_herogold_r;
 		int mem_herogold_d;
-		int offset = 0;
 		char gameid[ 32 ];
 
 		baseaddr = (int *)clientdll;
@@ -880,27 +827,26 @@ void D2H( HANDLE *hnd, void *clientdll )
 			ReadMisc( hnd, (void*)(*baseaddr + mem_heromisc) );
 			
 			for( i = 0; i < 2048; i++ ) {
-				r = 0;
 		
 				ptr = 0;
-				r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-				r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-				r = ReadProcessMemory(*hnd, (void*)((int)ptr + NPC_DOTA_HERO), buff, 32, NULL);	 
+				ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+				ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+				ReadProcessMemory(*hnd, (void*)((int)ptr + NPC_DOTA_HERO), buff, 32, NULL);	 
 
 				if( memcmp( buff, "npc_dota_hero", 13 ) == 0 ) {
 					ReadHAdv( hnd, (void*)(*baseaddr + mem_heroadv), i * 8 );
 				} else if( memcmp( buff, "npc_dota_roshan", 15 ) == 0 ) { 
-					r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-					r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-					r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.roshan_hp, 4, NULL);						
+					ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+					ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+					ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.roshan_hp, 4, NULL);						
 				} else if( memcmp( buff, "npc_dota_goodguys_fort", 22 ) == 0 ) { 
-					r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-					r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-					r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.rad_fort_hp, 4, NULL);	
+					ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+					ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+					ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.rad_fort_hp, 4, NULL);	
 				} else if( memcmp( buff, "npc_dota_badguys_fort", 21 ) == 0 ) {
-					r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-					r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
-					r = ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.dire_fort_hp, 4, NULL);	
+					ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+					ReadProcessMemory(*hnd, (void*)((int)ptr + i * 8), &ptr , 4, NULL); 
+					ReadProcessMemory(*hnd, (void*)((int)ptr + 0xf4), &gi.dire_fort_hp, 4, NULL);	
 				} else if( memcmp( buff, "npc_dota_observer_wards", 23 ) == 0 ) {
 					ReadWard( hnd, (void*)(*baseaddr + mem_heroadv), i * 8, 1 );
 				} else if( memcmp( buff, "npc_dota_sentry_wards", 21 ) == 0 ) {					
@@ -964,12 +910,13 @@ void D2H( HANDLE *hnd, void *clientdll )
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
 		*/
+		/*
 		for( i = 0; i < 16384; i++ ) {
-			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_herobasic), &ptr , 4, NULL);  
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
+			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_herobasic), &ptr , 4, NULL);  
+			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
-			
+		*/
 		/*
 		for( i = 0; i < 16384; i++ ) {		
 			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  

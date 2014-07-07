@@ -1,16 +1,16 @@
 dota2harvester
 ==============
 
-Dota2 memory reader
+Dota2 memory reader for win32.
 
-This is unforunately only a win32 version as linux version of dota2 has been released just recently.
+This software was used by www.dota2mobile.com during Valve Dota2 The International 2013.
 
-This software was used by www.dota2mobile.com during Valve Dota2 The International 2013
-
-It must be ran simmultaneously with valve dota2 game while client is in the observer mode.
+It must be ran simultaneously with valve dota2 game while client is in the observer mode.
 When it's executed, it creates a gamedata dump file that can be parsed and used for various purposes.
 
 Offsets must be updated, as they change after every client update ( approximately each Friday ).
+
+There is a guide explaining how to find offsets on https://vimeo.com/100057000 .
 
 To compile it, get mingw: http://sourceforge.net/projects/mingw/files/ and just make it.
 
@@ -24,14 +24,13 @@ List of information you can retrive:
 - gametime
 - score radiant
 - score dire
-- gametime
 - radiant fortress hp
 - dire fortress hp
-- towers' hp
-- rax' hp
-- roshan hp
-- wards side/hp/location
-- courier side/hp/location
+- towers
+- raxes
+- roshan
+- wards
+- couriers
 
 All 10 players' info:
 - maxhp
@@ -42,14 +41,14 @@ All 10 players' info:
 - hero ulti cd seconds
 - current hp
 - playername
-- heroid
+- hero id
 - assists
 - deaths
 - level
 - creeps killed
 - creeps denied
-- totalgold
-- totalexp
+- total gold
+- total exp
 - kills
 - all inventory/stash items
 

@@ -52,8 +52,8 @@ int initClient()
 
 int sendData( char *data, const int lSize ) {
 	int iResult;
-	char recvbuf[DEFAULT_BUFLEN] = "";
-	int recvbuflen = DEFAULT_BUFLEN;
+	//char recvbuf[DEFAULT_BUFLEN];
+	//int recvbuflen = DEFAULT_BUFLEN;
     //----------------------
     // Send an initial buffer
     iResult = send( ConnectSocket, data, lSize, 0 );
