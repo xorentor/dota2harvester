@@ -264,7 +264,7 @@ static void ReadGold( HANDLE *hnd, void *addr, void *addr1 )
 	void *ca;
 
 	offsets[ 0 ] = 0x760;
-	offsets[ 1 ] = 0x760;
+	offsets[ 1 ] = 0x7e0;
 	
 	for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {	
 		if( i < 5 ) {
@@ -314,7 +314,7 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 	offsets[ 4 ] = 0x349c;	// hero level 
 	offsets[ 5 ] = 0x34ec; 	// creeps killed
 	offsets[ 6 ] = 0x34c4;	// creeps denied
-	offsets[ 7 ] = 0x45cc; 	// total gold
+	offsets[ 7 ] = 0x45ec; 	// total gold
 	offsets[ 8 ] = 0x45f4;  // total exp
 	offsets[ 9 ] = 0x4c80;
 	offsets[ 10 ] = 0x32bc;	// kills
