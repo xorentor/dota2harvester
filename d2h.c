@@ -30,7 +30,7 @@ static Rax_t rax[ 12 ];
 static Courier_t couriers[ 8 ];
 static GeneralInfo_t gi;
 static Player0_t p[ HEROES_GAME_TOTAL ];
-static Hero_t heroes[ HEROES_TOTAL ] = {
+static const Hero_t heroes[] = {
 	{	"npc_dota_hero_antimage", 1 },
 	{	"npc_dota_hero_axe", 2 },
 	{	"npc_dota_hero_bane", 3 },
@@ -140,6 +140,7 @@ static Hero_t heroes[ HEROES_TOTAL ] = {
 	{	"npc_dota_hero_terrorblade", 109 },
 	{	"npc_dota_hero_phoenix", 110 }
 };
+static const int HEROES_ALL	= sizeof(heroes)/sizeof(*heroes);
 
 static void GetGameID( char *gameid )
 {
@@ -531,11 +532,7 @@ static void ReadHAdv( HANDLE *hnd, void *addr, const int offset )
 	
 	ReadString( hnd, addr, offsets, 2, buffer );
 	
-	for( i = 1; i <= HEROES_TOTAL; i++ ) {
-		if( i == 24 || i == 26 || i == 105 ) {
-			continue;
-		}	
-		
+	for( i = 0; i < HEROES_ALL; i++ ) {
 		if( memcmp( buffer, heroes[ i ].name, strlen( heroes[ i ].name ) ) == 0 ) {		
 			hero = GetHeroByID( heroes[ i ].id );
 			if( hero != NULL ) {
