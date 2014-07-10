@@ -309,7 +309,7 @@ static void ReadMisc( HANDLE *hnd, void *addr )
 *	and are no longer part of this structure ( someone needs to do the grunt work on these )
 */
 	offsets[ 0 ] = 0x3214; 	// hero id
-	offsets[ 1 ] = 0x32e8;	// assists
+	offsets[ 1 ] = 0x32e4;	// assists
 	offsets[ 2 ] = 0x330c;	// deaths
 	offsets[ 3 ] = 0x335c;	// dead secs
 	offsets[ 4 ] = 0x349c;	// hero level 
@@ -900,13 +900,13 @@ void D2H( HANDLE *hnd, void *clientdll )
 		exit(0);
 #else		
 		// testing here
-		/*
+		
 		for( i = 0; i < 16384; i++ ) {
-			r = ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heromisc), &ptr , 4, NULL);  
-			r = ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
+			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heromisc), &ptr , 4, NULL);  
+			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
-		*/
+		
 		/*
 		for( i = 0; i < 16384; i++ ) {
 			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_herobasic), &ptr , 4, NULL);  
