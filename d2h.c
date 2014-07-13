@@ -752,7 +752,14 @@ static void ExportAll( char *gameId )
 	}
 	
 #ifndef _DEBUG		
-	sendData( outputbuff, lSize );
+again:
+	if( sendData( outputbuff, lSize ) != 0 ) {
+		if( initClient() != 0 ) {
+			printf( "reconnect failed\n" );
+			exit(0);	
+		}
+		goto again;
+	}
 #endif	
 	
 	fclose( pFile );
