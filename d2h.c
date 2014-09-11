@@ -815,11 +815,11 @@ void D2H( HANDLE *hnd, void *clientdll )
 			courier_index = 0;
 					
 		
-			offsets[ 0 ] = 0x2fc;
+			offsets[ 0 ] = 0x30c;
 			gi.score_dire = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-			offsets[ 0 ] = 0x2f8;
+			offsets[ 0 ] = 0x308;
 			gi.score_rad = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
-			offsets[ 0 ] = 0x50;
+			offsets[ 0 ] = 0x54;
 			gi.gametime = ReadInt( hnd, (void*)(*baseaddr + mem_herobasic), offsets, 1 );	
 
 			
@@ -896,7 +896,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			// 
 			// to get the correct item id, you have to subtract the number from dump by 637 ( this number changes, just double check it )
 			// and compare it against http://dota2mobile.com/js/items.js
-			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x75 * 8 + 0x14 );
+			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x72 * 8 + 0x14 );
 			
 			ExportAll( gameid );
 			
@@ -907,26 +907,28 @@ void D2H( HANDLE *hnd, void *clientdll )
 		exit(0);
 #else		
 		// testing here
-	/*	
+		/*
 		for( i = 0; i < 16384; i++ ) {
 			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heromisc), &ptr , 4, NULL);  
 			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
-	*/	
-		/*
+		*/
+		
 		for( i = 0; i < 16384; i++ ) {
 			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_herobasic), &ptr , 4, NULL);  
 			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
-		*/
+		
+		/*
 for( i = 0; i < 16384; i++ ) {		
 	ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
 	ReadProcessMemory(*hnd, (void*)((int)ptr + 0x1E7 *8), &ptr , 4, NULL);
 	ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), buff , 32, NULL);			
 	printf( "T memory: %x value: %s\n", i*4, buff);
 }
+*/
 #endif
 
 }
