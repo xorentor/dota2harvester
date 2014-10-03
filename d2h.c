@@ -20,7 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "d2h.h"
 #include "client.h"
 
-#define NPC_DOTA_HERO		0x11b4
+#define NPC_DOTA_HERO		0x11b8
 
 static int ward_index;
 static int courier_index;
@@ -896,7 +896,7 @@ void D2H( HANDLE *hnd, void *clientdll )
 			// 
 			// to get the correct item id, you have to subtract the number from dump by 637 ( this number changes, just double check it )
 			// and compare it against http://dota2mobile.com/js/items.js
-			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x72 * 8 + 0x14 );
+			ReadItems( hnd, (void*)(*baseaddr + mem_items), 0x75 * 8 + 0x14 );
 			
 			ExportAll( gameid );
 			
@@ -914,21 +914,19 @@ void D2H( HANDLE *hnd, void *clientdll )
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
 		*/
-		
+		/*
 		for( i = 0; i < 16384; i++ ) {
 			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_herobasic), &ptr , 4, NULL);  
 			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), &ptr , 4, NULL); 
 			printf( "T memory: %x value: \"%d\"\n", i*4, ptr);
 		}
-		
-		/*
-for( i = 0; i < 16384; i++ ) {		
-	ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
-	ReadProcessMemory(*hnd, (void*)((int)ptr + 0x1E7 *8), &ptr , 4, NULL);
-	ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), buff , 32, NULL);			
-	printf( "T memory: %x value: %s\n", i*4, buff);
-}
-*/
+		*/
+		for( i = 0; i < 16384; i++ ) {		
+			ReadProcessMemory(*hnd, (void*)(*baseaddr + mem_heroadv), &ptr , 4, NULL);  
+			ReadProcessMemory(*hnd, (void*)((int)ptr + 0x1E8 *8), &ptr , 4, NULL);
+			ReadProcessMemory(*hnd, (void*)((int)ptr + i * 4), buff , 32, NULL);			
+			printf( "T memory: %x value: %s\n", i*4, buff);
+		}
 #endif
 
 }
