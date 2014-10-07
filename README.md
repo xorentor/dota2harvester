@@ -12,15 +12,10 @@ Offsets must be updated, as they change after every client update ( approximatel
 
 There is a guide explaining how to find offsets on https://vimeo.com/100057000 .
 
-To compile it, get mingw: http://sourceforge.net/projects/mingw/files/ and just make it.
+./src/client_win32cli - use mingw to build it
+./src/client_win32QTgui - use qmake to build it
 
-there are 2 .dll manadatory files:
-libgcc_s_dw2-1.dll
-libstdc++-6.dll
-
-You can grab these from your mingw bin directory if you don't trust mine.
-
-List of information you can retrive:
+List of information you can retrieve:
 - gametime
 - score radiant
 - score dire

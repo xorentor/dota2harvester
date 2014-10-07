@@ -1,0 +1,7 @@
+To compile it, get mingw: http://sourceforge.net/projects/mingw/files/ and just make it.
+
+there are 2 .dll manadatory files:
+libgcc_s_dw2-1.dll
+libstdc++-6.dll
+
+You can grab these from your mingw bin directory if you don't trust mine.

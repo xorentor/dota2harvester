@@ -1,0 +1,224 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Client	./client.cpp	/^Client::Client()$/;"	f	class:Client
+Client	./client.h	/^class Client {$/;"	c
+ConnectSocket	./client.h	/^    int ConnectSocket;$/;"	m	class:Client
+Courier_s	./worker.h	/^typedef struct Courier_s$/;"	s
+Courier_t	./worker.h	/^} Courier_t;$/;"	t	typeref:struct:Courier_s
+D2H_H	./d2h.h	2;"	d
+DEFAULT_BUFLEN	./client.h	8;"	d
+DR	./d2h.cpp	42;"	d	file:
+GIR	./worker.cpp	839;"	d	file:
+GIT	./worker.cpp	840;"	d	file:
+GeneralInfo_s	./worker.h	/^typedef struct GeneralInfo_s$/;"	s
+GeneralInfo_t	./worker.h	/^} GeneralInfo_t;$/;"	t	typeref:struct:GeneralInfo_s
+GetGameID	./worker.cpp	/^void Worker::GetGameID( char *gameid )$/;"	f	class:Worker
+GetHeroByID	./worker.cpp	/^Player0_t *Worker::GetHeroByID( const int id )$/;"	f	class:Worker
+GetProcessList	./worker.cpp	/^bool Worker::GetProcessList()$/;"	f	class:Worker
+HEROES_ALL	./worker.cpp	/^static const int HEROES_ALL	= sizeof(heroes)\/sizeof(*heroes);$/;"	v	file:
+HEROES_GAME_TOTAL	./worker.h	24;"	d
+Hero_s	./worker.h	/^typedef struct Hero_s$/;"	s
+Hero_t	./worker.h	/^} Hero_t;$/;"	t	typeref:struct:Hero_s
+ListProcessModules	./worker.cpp	/^bool Worker::ListProcessModules( DWORD dwPID, HANDLE *hnd )$/;"	f	class:Worker
+ListProcessThreads	./worker.cpp	/^bool Worker::ListProcessThreads( DWORD dwOwnerPID )$/;"	f	class:Worker
+MEM_HEROADV	./worker.h	17;"	d
+MEM_HEROBASIC	./worker.h	16;"	d
+MEM_HEROGOLD_D	./worker.h	21;"	d
+MEM_HEROGOLD_R	./worker.h	20;"	d
+MEM_HEROMISC	./worker.h	18;"	d
+MEM_ITEMS	./worker.h	19;"	d
+NPC_DOTA_HERO	./worker.h	30;"	d
+Player0_s	./worker.h	/^typedef struct Player0_s$/;"	s
+Player0_t	./worker.h	/^} Player0_t;$/;"	t	typeref:struct:Player0_s
+QT_MOC_LITERAL	./release\moc_d2h.cpp	25;"	d	file:
+QT_MOC_LITERAL	./release\moc_d2h.cpp	38;"	d	file:
+READVARIOUS	./worker.cpp	801;"	d	file:
+Rax_s	./worker.h	/^typedef struct Rax_s$/;"	s
+Rax_t	./worker.h	/^} Rax_t;$/;"	t	typeref:struct:Rax_s
+ReadAncients	./worker.cpp	/^void Worker::ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer )$/;"	f	class:Worker
+ReadCourier	./worker.cpp	/^void Worker::ReadCourier( HANDLE *hnd, void *addr, const int offset ) {$/;"	f	class:Worker
+ReadFloat	./worker.cpp	/^float Worker::ReadFloat( HANDLE *hnd, void *addr, int *ost, const int ost_num )$/;"	f	class:Worker
+ReadGold	./worker.cpp	/^void Worker::ReadGold( HANDLE *hnd, void *addr, void *addr1 )$/;"	f	class:Worker
+ReadH	./worker.cpp	/^void Worker::ReadH( HANDLE *hnd, void *addr )$/;"	f	class:Worker
+ReadHAdv	./worker.cpp	/^void Worker::ReadHAdv( HANDLE *hnd, void *addr, const int offset )$/;"	f	class:Worker
+ReadInt	./worker.cpp	/^int Worker::ReadInt( HANDLE *hnd, void *addr, int *ost, const int ost_num )$/;"	f	class:Worker
+ReadItems	./worker.cpp	/^void Worker::ReadItems( HANDLE *hnd, void *addr, int offset )$/;"	f	class:Worker
+ReadMisc	./worker.cpp	/^void Worker::ReadMisc( HANDLE *hnd, void *addr )$/;"	f	class:Worker
+ReadRax	./worker.cpp	/^void Worker::ReadRax( HANDLE *hnd, void *addr, const int offset, const int index ) {$/;"	f	class:Worker
+ReadString	./worker.cpp	/^void Worker::ReadString( HANDLE *hnd, void *addr, int *ost, const int ost_num, char *buffer )$/;"	f	class:Worker
+ReadTower	./worker.cpp	/^void Worker::ReadTower( HANDLE *hnd, void *addr, const int offset, const int index ) {$/;"	f	class:Worker
+ReadWard	./worker.cpp	/^void Worker::ReadWard( HANDLE *hnd, void *addr, const int offset, const int type ) {$/;"	f	class:Worker
+T_FLOAT	./worker.h	27;"	d
+T_INT	./worker.h	26;"	d
+T_STRING	./worker.h	28;"	d
+Tower_s	./worker.h	/^typedef struct Tower_s$/;"	s
+Tower_t	./worker.h	/^} Tower_t;$/;"	t	typeref:struct:Tower_s
+UI_D2H_H	./ui_d2h.h	10;"	d
+UNICODE	./client.h	5;"	d
+Ui	./d2h.h	/^namespace Ui {$/;"	n
+Ui	./ui_d2h.h	/^namespace Ui {$/;"	n
+Ui_d2h	./ui_d2h.h	/^class Ui_d2h$/;"	c
+WORKER_H	./worker.h	2;"	d
+Ward_s	./worker.h	/^typedef struct Ward_s$/;"	s
+Ward_t	./worker.h	/^} Ward_t;$/;"	t	typeref:struct:Ward_s
+Worker	./worker.cpp	/^Worker::Worker( struct guiobj_s ***fs ) : edits(fs) {$/;"	f	class:Worker
+Worker	./worker.h	/^class Worker : public QThread {$/;"	c
+_CLIENT_H_	./client.h	2;"	d
+_COMMON_H_	./common.h	2;"	d
+_DEBUG	./worker.h	33;"	d
+__cmp	./worker.cpp	/^int __cmp( WCHAR *w, char *s ) {$/;"	f
+actionAbout	./ui_d2h.h	/^    QAction *actionAbout;$/;"	m	class:Ui_d2h
+centralwidget	./ui_d2h.h	/^    QWidget *centralwidget;$/;"	m	class:Ui_d2h
+checkBox	./ui_d2h.h	/^    QCheckBox *checkBox;$/;"	m	class:Ui_d2h
+checkBox_2	./ui_d2h.h	/^    QCheckBox *checkBox_2;$/;"	m	class:Ui_d2h
+client	./d2h.h	/^    Client *client;$/;"	m	class:d2h
+closeClient	./client.cpp	/^int Client::closeClient()$/;"	f	class:Client
+connected	./client.h	/^    int connected;$/;"	m	class:Client
+courier_index	./worker.cpp	/^static int courier_index;$/;"	v	file:
+couriers	./worker.cpp	/^static Courier_t couriers[ 8 ];$/;"	v	file:
+currenthp	./worker.h	/^    int currenthp;$/;"	m	struct:Player0_s
+d2h	./d2h.cpp	/^d2h::d2h(QWidget *parent) :$/;"	f	class:d2h
+d2h	./d2h.h	/^class d2h : public QMainWindow$/;"	c
+d2h	./ui_d2h.h	/^    class d2h: public Ui_d2h {};$/;"	c	namespace:Ui
+daddr	./worker.h	/^    int daddr;$/;"	m	class:Worker
+data	./release\moc_d2h.cpp	/^    QByteArrayData data[3];$/;"	m	struct:qt_meta_stringdata_d2h_t	file:
+dhandle	./worker.h	/^    HANDLE dhandle;$/;"	m	class:Worker
+dire_fort_hp	./worker.h	/^    int dire_fort_hp;$/;"	m	struct:GeneralInfo_s
+duplicate	./worker.h	/^    int duplicate;$/;"	m	struct:Player0_s
+editIP	./ui_d2h.h	/^    QLineEdit *editIP;$/;"	m	class:Ui_d2h
+editPass	./ui_d2h.h	/^    QLineEdit *editPass;$/;"	m	class:Ui_d2h
+edits	./worker.h	/^    struct guiobj_s ***edits;$/;"	m	class:Worker	typeref:struct:Worker::guiobj_s
+fort	./worker.h	/^    int fort;$/;"	m	struct:GeneralInfo_s
+gametime	./worker.h	/^    int gametime;$/;"	m	struct:GeneralInfo_s
+generateEdits	./d2h.cpp	/^void d2h::generateEdits() {$/;"	f	class:d2h
+gi	./worker.cpp	/^static GeneralInfo_t gi;$/;"	v	file:
+groupBox	./ui_d2h.h	/^    QGroupBox *groupBox;$/;"	m	class:Ui_d2h
+groupBox_2	./ui_d2h.h	/^    QGroupBox *groupBox_2;$/;"	m	class:Ui_d2h
+groupBox_3	./ui_d2h.h	/^    QGroupBox *groupBox_3;$/;"	m	class:Ui_d2h
+guiobj	./d2h.h	/^    struct guiobj_s ***guiobj;$/;"	m	class:d2h	typeref:struct:d2h::guiobj_s
+guiobj_s	./d2h.h	/^struct guiobj_s {$/;"	s
+hero_assists	./worker.h	/^    int hero_assists;$/;"	m	struct:Player0_s
+hero_cd	./worker.h	/^    int hero_cd;$/;"	m	struct:Player0_s
+hero_ck	./worker.h	/^    int hero_ck;$/;"	m	struct:Player0_s
+hero_dead_sec	./worker.h	/^    int hero_dead_sec;$/;"	m	struct:Player0_s
+hero_deaths	./worker.h	/^    int hero_deaths;$/;"	m	struct:Player0_s
+hero_gold	./worker.h	/^    int hero_gold;$/;"	m	struct:Player0_s
+hero_id	./worker.h	/^    int hero_id;$/;"	m	struct:Player0_s
+hero_kills	./worker.h	/^    int hero_kills;$/;"	m	struct:Player0_s
+hero_level	./worker.h	/^    int hero_level;$/;"	m	struct:Player0_s
+hero_slot	./worker.h	/^    int hero_slot;$/;"	m	struct:Player0_s
+hero_ulticd_sec	./worker.h	/^    int hero_ulticd_sec;$/;"	m	struct:Player0_s
+heroes	./worker.cpp	/^static const Hero_t heroes[] = {$/;"	v	file:
+hp	./worker.h	/^    int hp;$/;"	m	struct:Courier_s
+hp	./worker.h	/^    int hp;$/;"	m	struct:Rax_s
+hp	./worker.h	/^    int hp;$/;"	m	struct:Tower_s
+hp	./worker.h	/^    int hp;$/;"	m	struct:Ward_s
+i0	./worker.h	/^    int i0;$/;"	m	struct:Player0_s
+i1	./worker.h	/^    int i1;$/;"	m	struct:Player0_s
+i2	./worker.h	/^    int i2;$/;"	m	struct:Player0_s
+i3	./worker.h	/^    int i3;$/;"	m	struct:Player0_s
+i4	./worker.h	/^    int i4;$/;"	m	struct:Player0_s
+i5	./worker.h	/^    int i5;$/;"	m	struct:Player0_s
+id	./worker.h	/^    int id;$/;"	m	struct:Hero_s
+initClient	./client.cpp	/^int Client::initClient( const char *ip, const int port )$/;"	f	class:Client
+label	./ui_d2h.h	/^    QLabel *label;$/;"	m	class:Ui_d2h
+label_10	./ui_d2h.h	/^    QLabel *label_10;$/;"	m	class:Ui_d2h
+label_2	./ui_d2h.h	/^    QLabel *label_2;$/;"	m	class:Ui_d2h
+label_3	./ui_d2h.h	/^    QLabel *label_3;$/;"	m	class:Ui_d2h
+label_4	./ui_d2h.h	/^    QLabel *label_4;$/;"	m	class:Ui_d2h
+label_9	./ui_d2h.h	/^    QLabel *label_9;$/;"	m	class:Ui_d2h
+leDire	./ui_d2h.h	/^    QLineEdit *leDire;$/;"	m	class:Ui_d2h
+leGametime	./ui_d2h.h	/^    QLineEdit *leGametime;$/;"	m	class:Ui_d2h
+leRadiant	./ui_d2h.h	/^    QLineEdit *leRadiant;$/;"	m	class:Ui_d2h
+leRoshan	./ui_d2h.h	/^    QLineEdit *leRoshan;$/;"	m	class:Ui_d2h
+listWidget	./ui_d2h.h	/^    QListWidget *listWidget;$/;"	m	class:Ui_d2h
+main	./main.cpp	/^int main(int argc, char *argv[])$/;"	f
+maxhp	./worker.h	/^    int maxhp;$/;"	m	struct:Player0_s
+menuAbout	./ui_d2h.h	/^    QMenu *menuAbout;$/;"	m	class:Ui_d2h
+menuMenu	./ui_d2h.h	/^    QMenu *menuMenu;$/;"	m	class:Ui_d2h
+menubar	./ui_d2h.h	/^    QMenuBar *menubar;$/;"	m	class:Ui_d2h
+metaObject	./release\moc_d2h.cpp	/^const QMetaObject *d2h::metaObject() const$/;"	f	class:d2h
+misc_assists	./worker.h	/^    int misc_assists;$/;"	m	struct:Player0_s
+misc_cd	./worker.h	/^    int misc_cd;$/;"	m	struct:Player0_s
+misc_ck	./worker.h	/^    int misc_ck;$/;"	m	struct:Player0_s
+misc_currentg0	./worker.h	/^    int misc_currentg0;$/;"	m	struct:Player0_s
+misc_currentg1	./worker.h	/^    int misc_currentg1;$/;"	m	struct:Player0_s
+misc_dead_sec	./worker.h	/^    int misc_dead_sec;$/;"	m	struct:Player0_s
+misc_deaths	./worker.h	/^    int misc_deaths;$/;"	m	struct:Player0_s
+misc_heroid	./worker.h	/^    int misc_heroid;$/;"	m	struct:Player0_s
+misc_kills	./worker.h	/^    int misc_kills;$/;"	m	struct:Player0_s
+misc_level	./worker.h	/^    int misc_level;$/;"	m	struct:Player0_s
+misc_totalexp	./worker.h	/^    int misc_totalexp;$/;"	m	struct:Player0_s
+misc_totalgold	./worker.h	/^    int misc_totalgold;$/;"	m	struct:Player0_s
+modelname	./worker.h	/^    char modelname[ 64 ];$/;"	m	struct:Player0_s
+name	./worker.h	/^    char name[ 64 ];$/;"	m	struct:Hero_s
+on_pbConnect_clicked	./d2h.cpp	/^void d2h::on_pbConnect_clicked() {$/;"	f	class:d2h
+p	./worker.cpp	/^static Player0_t p[ HEROES_GAME_TOTAL ];$/;"	v	file:
+parseData	./worker.cpp	/^void Worker::parseData( HANDLE hnd, int clientdll )$/;"	f	class:Worker
+pbConnect	./ui_d2h.h	/^    QPushButton *pbConnect;$/;"	m	class:Ui_d2h
+pbStream	./ui_d2h.h	/^    QPushButton *pbStream;$/;"	m	class:Ui_d2h
+playername	./worker.h	/^    char playername[ 64 ];$/;"	m	struct:Player0_s
+qe	./d2h.h	/^    QLineEdit *qe;$/;"	m	struct:guiobj_s
+qt_meta_data_d2h	./release\moc_d2h.cpp	/^static const uint qt_meta_data_d2h[] = {$/;"	v	file:
+qt_meta_stringdata_d2h	./release\moc_d2h.cpp	/^static const qt_meta_stringdata_d2h_t qt_meta_stringdata_d2h = {$/;"	v	file:
+qt_meta_stringdata_d2h_t	./release\moc_d2h.cpp	/^struct qt_meta_stringdata_d2h_t {$/;"	s	file:
+qt_metacall	./release\moc_d2h.cpp	/^int d2h::qt_metacall(QMetaObject::Call _c, int _id, void **_a)$/;"	f	class:d2h
+qt_metacast	./release\moc_d2h.cpp	/^void *d2h::qt_metacast(const char *_clname)$/;"	f	class:d2h
+qt_static_metacall	./release\moc_d2h.cpp	/^void d2h::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)$/;"	f	class:d2h
+rad_fort_hp	./worker.h	/^    int	rad_fort_hp;$/;"	m	struct:GeneralInfo_s
+rax	./worker.cpp	/^static Rax_t rax[ 12 ];$/;"	v	file:
+rax	./worker.h	/^    int rax;$/;"	m	struct:GeneralInfo_s
+retranslateUi	./ui_d2h.h	/^    void retranslateUi(QMainWindow *d2h)$/;"	f	class:Ui_d2h
+roshan_hp	./worker.h	/^    int roshan_hp;$/;"	m	struct:GeneralInfo_s
+run	./worker.cpp	/^void Worker::run() {$/;"	f	class:Worker
+s0	./worker.h	/^    int s0;$/;"	m	struct:Player0_s
+s1	./worker.h	/^    int s1;$/;"	m	struct:Player0_s
+s2	./worker.h	/^    int s2;$/;"	m	struct:Player0_s
+s3	./worker.h	/^    int s3;$/;"	m	struct:Player0_s
+s4	./worker.h	/^    int s4;$/;"	m	struct:Player0_s
+s5	./worker.h	/^    int s5;$/;"	m	struct:Player0_s
+score_dire	./worker.h	/^    int score_dire;$/;"	m	struct:GeneralInfo_s
+score_rad	./worker.h	/^    int score_rad;$/;"	m	struct:GeneralInfo_s
+sendData	./client.cpp	/^int Client::sendData( char *data, const int lSize ) {$/;"	f	class:Client
+setGUI	./worker.cpp	/^void Worker::setGUI()$/;"	f	class:Worker
+setupUi	./ui_d2h.h	/^    void setupUi(QMainWindow *d2h)$/;"	f	class:Ui_d2h
+side	./worker.h	/^    int side;$/;"	m	struct:Courier_s
+side	./worker.h	/^    int side;$/;"	m	struct:Player0_s
+side	./worker.h	/^    int side;$/;"	m	struct:Rax_s
+side	./worker.h	/^    int side;$/;"	m	struct:Tower_s
+side	./worker.h	/^    int side;$/;"	m	struct:Ward_s
+startParser	./worker.h	/^    int startParser;$/;"	m	class:Worker
+staticMetaObject	./release\moc_d2h.cpp	/^const QMetaObject d2h::staticMetaObject = {$/;"	m	class:d2h	file:
+statusbar	./ui_d2h.h	/^    QStatusBar *statusbar;$/;"	m	class:Ui_d2h
+stringdata	./release\moc_d2h.cpp	/^    char stringdata[27];$/;"	m	struct:qt_meta_stringdata_d2h_t	file:
+systemMsg	./d2h.cpp	/^void d2h::systemMsg( const char *msg ) {$/;"	f	class:d2h
+tab	./ui_d2h.h	/^    QWidget *tab;$/;"	m	class:Ui_d2h
+tabWidget	./ui_d2h.h	/^    QTabWidget *tabWidget;$/;"	m	class:Ui_d2h
+tab_2	./ui_d2h.h	/^    QWidget *tab_2;$/;"	m	class:Ui_d2h
+tab_3	./ui_d2h.h	/^    QWidget *tab_3;$/;"	m	class:Ui_d2h
+tab_4	./ui_d2h.h	/^    QWidget *tab_4;$/;"	m	class:Ui_d2h
+towers	./worker.cpp	/^static Tower_t towers[ 22 ];$/;"	v	file:
+towers	./worker.h	/^    int towers;$/;"	m	struct:GeneralInfo_s
+type	./worker.h	/^    int type;$/;"	m	struct:Ward_s
+ui	./d2h.h	/^    Ui::d2h *ui;$/;"	m	class:d2h
+ward_index	./worker.cpp	/^static int ward_index;$/;"	v	file:
+wards	./worker.cpp	/^static Ward_t wards[ 16 ];$/;"	v	file:
+x	./d2h.h	/^    int x;$/;"	m	struct:guiobj_s
+x	./worker.h	/^    float x;$/;"	m	struct:Player0_s
+x	./worker.h	/^    float x;$/;"	m	struct:Rax_s
+x	./worker.h	/^    float x;$/;"	m	struct:Tower_s
+x	./worker.h	/^    int x;$/;"	m	struct:Courier_s
+x	./worker.h	/^    int x;$/;"	m	struct:Ward_s
+y	./d2h.h	/^    int y;$/;"	m	struct:guiobj_s
+y	./worker.h	/^    float y;$/;"	m	struct:Player0_s
+y	./worker.h	/^    float y;$/;"	m	struct:Rax_s
+y	./worker.h	/^    float y;$/;"	m	struct:Tower_s
+y	./worker.h	/^    int y;$/;"	m	struct:Courier_s
+y	./worker.h	/^    int y;$/;"	m	struct:Ward_s
+~Client	./client.cpp	/^Client::~Client()$/;"	f	class:Client
+~Worker	./worker.cpp	/^Worker::~Worker() {$/;"	f	class:Worker
+~d2h	./d2h.cpp	/^d2h::~d2h()$/;"	f	class:d2h
