@@ -32,6 +32,10 @@
 //#undef _DEBUG
 #define _DEBUG
 
+namespace Ui {
+class Worker;
+}
+
 typedef struct GeneralInfo_s
 {
     int score_rad;
@@ -136,7 +140,7 @@ typedef struct Courier_s
 
 class Worker : public QThread {
 public:
-    Worker( struct guiobj_s ***fs );
+    Worker( struct guiobj_s ***fs, Client *cl, QLineEdit *ip, QLineEdit *port );
     ~Worker();
 
 protected:
@@ -147,6 +151,8 @@ private:
     int startParser;
     HANDLE dhandle;
     int daddr;
+    Client *cl;
+    QLineEdit *ip, *port;
 
     bool GetProcessList();
     bool ListProcessModules( DWORD dwPID, HANDLE *hnd );
@@ -171,6 +177,9 @@ private:
     void ReadAncients( HANDLE *hnd, void *addr, const int offset, char *buffer );
     void ReadHAdv( HANDLE *hnd, void *addr, const int offset );
     void ReadItems( HANDLE *hnd, void *addr, int offset );
+    void doWrite( void *var, const int type, char *buffer, FILE *f );
+    void ExportAll( char *gameId );
+
 };
 
 

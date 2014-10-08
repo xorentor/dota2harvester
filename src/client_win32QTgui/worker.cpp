@@ -7,6 +7,7 @@
 #include <time.h>
 
 #include "d2h.h"
+#include "client.h"
 #include "worker.h"
 
 static int ward_index;
@@ -129,7 +130,7 @@ static const Hero_t heroes[] = {
 };
 static const int HEROES_ALL	= sizeof(heroes)/sizeof(*heroes);
 
-Worker::Worker( struct guiobj_s ***fs ) : edits(fs) {
+Worker::Worker( struct guiobj_s ***fs, Client *client, QLineEdit *ip, QLineEdit *port ) : edits(fs), cl(client), ip(ip), port(port) {
     startParser = 0;
     GetProcessList();
 }
@@ -412,6 +413,16 @@ void Worker::setGUI()
         GI(p[i].misc_totalexp);
         GI(p[i].misc_currentg0);
         GI(p[i].misc_currentg1);
+    }
+
+    ptr = 0;
+#define GI(s)\
+    memset( tmp, 0, sizeof( tmp ));\
+    _itoa( s, tmp, 10 );\
+    edits[1][ptr++]->qe->setText( tmp );
+
+    for( i = 0; i < 22; i++ ) {
+        GI(towers[i].hp);
     }
 }
 
@@ -1054,4 +1065,153 @@ void Worker::ReadItems( HANDLE *hnd, void *addr, int offset )
         printf( "player item stash:%d id:%d\n", i, p[ i ].s5 );
 #endif
     }
+}
+
+void Worker::doWrite( void *var, const int type, char *buffer, FILE *f )
+{
+    int *x;
+    float *y;
+    char *z;
+
+    if( type == T_INT ) {
+        x = (int *)var;
+        memset( buffer, 0, sizeof( *buffer ) );
+        sprintf( buffer, "%d\n", *x );
+        fwrite( buffer, 1, strlen( buffer ), f );
+    } else if( type == T_FLOAT ) {
+        y = (float *)var;
+        memset( buffer, 0, sizeof( *buffer ) );
+        sprintf( buffer, "%f\n", *y );
+        fwrite( buffer, 1, strlen( buffer ), f );
+    } else if( type == T_STRING ) {
+        z = (char *)var;
+        memset( buffer, 0, sizeof( *buffer ) );
+        sprintf( buffer, "%s\n", z );
+        fwrite( buffer, 1, strlen( buffer ), f );
+    }
+}
+
+void Worker::ExportAll( char *gameId )
+{
+    FILE *pFile;
+    char buffer[ 64 ];
+    char *outputbuff;
+    int lSize;
+    int i;
+    const char *tmp = "gamedata";
+    char bufferf[ 128 ];
+
+    memset( bufferf, 0, sizeof( bufferf ) );
+
+    pFile = fopen( tmp, "w" );
+    if( pFile == NULL ) {
+        printf("file error\n");
+    }
+    fseek( pFile, 0, SEEK_END );
+
+    // gameid
+    doWrite( gameId, T_STRING, buffer, pFile );
+    // general
+    doWrite( &gi.score_rad, T_INT, buffer, pFile );
+    doWrite( &gi.score_dire, T_INT, buffer, pFile );
+    doWrite( &gi.gametime, T_INT, buffer, pFile );
+    doWrite( &gi.fort, T_INT, buffer, pFile );
+    doWrite( &gi.rax, T_INT, buffer, pFile );
+    doWrite( &gi.towers, T_INT, buffer, pFile );
+    doWrite( &gi.roshan_hp, T_INT, buffer, pFile );
+    doWrite( &gi.rad_fort_hp, T_INT, buffer, pFile );
+    doWrite( &gi.dire_fort_hp, T_INT, buffer, pFile );
+
+    for( i = 0; i < HEROES_GAME_TOTAL; i++ ) {
+        doWrite( &i, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_heroid, T_INT, buffer, pFile );
+        doWrite( &p[ i ].maxhp, T_INT, buffer, pFile );
+        doWrite( &p[ i ].x, T_FLOAT, buffer, pFile );
+        doWrite( &p[ i ].y, T_FLOAT, buffer, pFile );
+        doWrite( &p[ i ].side, T_INT, buffer, pFile );
+        doWrite( &p[ i ].modelname, T_STRING, buffer, pFile );
+        doWrite( &p[ i ].misc_dead_sec, T_INT, buffer, pFile );
+        doWrite( &p[ i ].hero_ulticd_sec, T_INT, buffer, pFile );
+        doWrite( &p[ i ].currenthp, T_INT, buffer, pFile );
+        doWrite( &p[ i ].playername, T_STRING, buffer, pFile );
+        doWrite( &p[ i ].misc_heroid, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_assists, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_deaths, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_level, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_ck, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_cd, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_totalgold, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_totalexp, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_dead_sec, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_kills, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_currentg0, T_INT, buffer, pFile );
+        doWrite( &p[ i ].misc_currentg1, T_INT, buffer, pFile );
+
+        doWrite( &p[ i ].i0, T_INT, buffer, pFile );
+        doWrite( &p[ i ].i1, T_INT, buffer, pFile );
+        doWrite( &p[ i ].i2, T_INT, buffer, pFile );
+        doWrite( &p[ i ].i3, T_INT, buffer, pFile );
+        doWrite( &p[ i ].i4, T_INT, buffer, pFile );
+        doWrite( &p[ i ].i5, T_INT, buffer, pFile );
+        doWrite( &p[ i ].s0, T_INT, buffer, pFile );
+        doWrite( &p[ i ].s1, T_INT, buffer, pFile );
+        doWrite( &p[ i ].s2, T_INT, buffer, pFile );
+        doWrite( &p[ i ].s3, T_INT, buffer, pFile );
+        doWrite( &p[ i ].s4, T_INT, buffer, pFile );
+        doWrite( &p[ i ].s5, T_INT, buffer, pFile );
+    }
+
+    // towers
+    for( i = 0; i < 22; i++ )
+        doWrite( &towers[ i ].hp, T_INT, buffer, pFile );
+
+    // rax
+    for( i = 0; i < 12; i++ )
+        doWrite( &rax[ i ].hp, T_INT, buffer, pFile );
+
+    // wards
+    for( i = 0; i < 16; i++ ) {
+        doWrite( &wards[ i ].side, T_INT, buffer, pFile );
+        doWrite( &wards[ i ].hp, T_INT, buffer, pFile );
+        doWrite( &wards[ i ].x, T_INT, buffer, pFile );
+        doWrite( &wards[ i ].y, T_INT, buffer, pFile );
+        doWrite( &wards[ i ].type, T_INT, buffer, pFile );
+    }
+
+    // couriers
+    for( i = 0; i < 8; i++ ) {
+        doWrite( &couriers[ i ].side, T_INT, buffer, pFile );
+        doWrite( &couriers[ i ].hp, T_INT, buffer, pFile );
+        doWrite( &couriers[ i ].x, T_INT, buffer, pFile );
+        doWrite( &couriers[ i ].y, T_INT, buffer, pFile );
+    }
+
+    fclose( pFile );
+
+    pFile = fopen( tmp , "r" );
+    fseek( pFile, 0, SEEK_END );
+    lSize = ftell( pFile );
+    lSize += sizeof(int); 	// add header length
+    rewind( pFile );
+
+    outputbuff = (char *)malloc( sizeof(char) * lSize + sizeof(int) );
+    *(int *)outputbuff = lSize;
+    fread( outputbuff + sizeof(int), 1, lSize, pFile );
+
+    for( i = 0; i < lSize; i++ ) {
+        if( outputbuff[ i ] == 13 )
+            outputbuff[ i ] = 0;
+    }
+
+again:
+    if( cl->sendData( outputbuff, lSize ) != 0 ) {
+        if( cl->initClient( ip->text().toLocal8Bit().data(), port->text().toInt() ) != 0 ) {
+            printf( "reconnect failed\n" );
+            exit(0);
+        }
+        goto again;
+    }
+
+    fclose( pFile );
+    free( outputbuff );
 }

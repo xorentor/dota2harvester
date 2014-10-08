@@ -24,6 +24,7 @@ public:
 private:
     void systemMsg( const char *msg );
     void generateEdits();
+    void onIdle();
 
 private slots:
     void on_pbConnect_clicked();

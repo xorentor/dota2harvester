@@ -16,7 +16,7 @@ d2h::d2h(QWidget *parent) :
     client = new Client();
     generateEdits();
 
-    Worker *w = new Worker( guiobj );
+    Worker *w = new Worker( guiobj, client, ui->editIP, ui->editPass );
     w->start();
 }
 
@@ -34,6 +34,7 @@ void d2h::generateEdits() {
     int h, i, x, y, a, b, ptr;
     struct guiobj_s *idx;
     char *allocptr;
+    char tmp[ 128 ];
 
     a = 20;
     b = 30;
@@ -105,6 +106,13 @@ void d2h::generateEdits() {
     x = 100;
     y = 30;
 
+    ql = new QLabel("X", ui->tabWidget->widget(1));\
+    ql->setGeometry(QRect(120, 10, 70, 20));\
+    ql = new QLabel("Y", ui->tabWidget->widget(1));\
+    ql->setGeometry(QRect(180, 10, 70, 20));\
+    ql = new QLabel("Side", ui->tabWidget->widget(1));\
+    ql->setGeometry(QRect(240, 10, 70, 20));\
+
     ptr = 0;
 #define DR(s)\
     ql = new QLabel(s, ui->tabWidget->widget(1));\
@@ -133,6 +141,128 @@ void d2h::generateEdits() {
             y += 20;
         }
 
+        y = 30;
+        x += 60;
+    }
+
+
+    a = 250;
+    b = 30;
+    x = 320;
+    y = 30;
+
+    DR("Top Range");
+    DR("Top Melee");
+    DR("Mid Range");
+    DR("Mid Melee");
+    DR("Bot Range");
+    DR("Bot Melee");
+
+    for( h = 0; h < 2; h++ ) {
+        for( i = 0; i < 6; i++ ) {
+            QLineEdit *qe = new QLineEdit(ui->tabWidget->widget(1));
+            qe->setGeometry(QRect(x, y, 60, 20));
+            qe->setEnabled(false);
+            idx = (struct guiobj_s *)malloc( sizeof( struct guiobj_s ));
+            idx->qe = qe;
+            guiobj[1][ptr++] = idx;
+            y += 20;
+        }
+
+        y = 30;
+        x += 60;
+    }
+
+    a = 250;
+    b = 170;
+    x = 320;
+    y = 170;
+
+    DR("Fortress");
+
+    for( h = 0; h < 2; h++ ) {
+        for( i = 0; i < 1; i++ ) {
+            QLineEdit *qe = new QLineEdit(ui->tabWidget->widget(1));
+            qe->setGeometry(QRect(x, y, 60, 20));
+            qe->setEnabled(false);
+            idx = (struct guiobj_s *)malloc( sizeof( struct guiobj_s ));
+            idx->qe = qe;
+            guiobj[1][ptr++] = idx;
+            y += 20;
+        }
+
+        y = 170;
+        x += 60;
+    }
+
+    a = 20;
+    b = 30;
+    x = 100;
+    y = 30;
+
+    ptr = 0;
+#define DR(s)\
+    ql = new QLabel(s, ui->tabWidget->widget(2));\
+    ql->setGeometry(QRect(a, b, 70, 20));\
+    b+=20;
+    for( i = 0; i < 16; i++ ) {
+        _itoa( i+1, tmp, 10 );\
+        DR( tmp );
+    }
+
+    ql = new QLabel("X", ui->tabWidget->widget(2));\
+    ql->setGeometry(QRect(120, 10, 70, 20));\
+    ql = new QLabel("Y", ui->tabWidget->widget(2));\
+    ql->setGeometry(QRect(180, 10, 70, 20));\
+    ql = new QLabel("Side", ui->tabWidget->widget(2));\
+    ql->setGeometry(QRect(240, 10, 70, 20));\
+
+    for( h = 0; h < 3; h++ ) {
+        for( i = 0; i < 16; i++ ) {
+            QLineEdit *qe = new QLineEdit(ui->tabWidget->widget(2));
+            qe->setGeometry(QRect(x, y, 60, 20));
+            qe->setEnabled(false);
+            idx = (struct guiobj_s *)malloc( sizeof( struct guiobj_s ));
+            idx->qe = qe;
+            guiobj[2][ptr++] = idx;
+            y += 20;
+        }
+        y = 30;
+        x += 60;
+    }
+
+    a = 20;
+    b = 30;
+    x = 100;
+    y = 30;
+
+    ptr = 0;
+#define DR(s)\
+    ql = new QLabel(s, ui->tabWidget->widget(3));\
+    ql->setGeometry(QRect(a, b, 70, 20));\
+    b+=20;
+    for( i = 0; i < 8; i++ ) {
+        _itoa( i+1, tmp, 10 );\
+        DR( tmp );
+    }
+
+    ql = new QLabel("X", ui->tabWidget->widget(3));\
+    ql->setGeometry(QRect(120, 10, 70, 20));\
+    ql = new QLabel("Y", ui->tabWidget->widget(3));\
+    ql->setGeometry(QRect(180, 10, 70, 20));\
+    ql = new QLabel("Side", ui->tabWidget->widget(3));\
+    ql->setGeometry(QRect(240, 10, 70, 20));\
+
+    for( h = 0; h < 3; h++ ) {
+        for( i = 0; i < 8; i++ ) {
+            QLineEdit *qe = new QLineEdit(ui->tabWidget->widget(3));
+            qe->setGeometry(QRect(x, y, 60, 20));
+            qe->setEnabled(false);
+            idx = (struct guiobj_s *)malloc( sizeof( struct guiobj_s ));
+            idx->qe = qe;
+            guiobj[2][ptr++] = idx;
+            y += 20;
+        }
         y = 30;
         x += 60;
     }

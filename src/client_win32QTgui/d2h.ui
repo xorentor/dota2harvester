@@ -111,7 +111,7 @@
     <property name="title">
      <string>Status</string>
     </property>
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="cbDota">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -119,15 +119,15 @@
       <rect>
        <x>110</x>
        <y>20</y>
-       <width>141</width>
+       <width>101</width>
        <height>21</height>
       </rect>
      </property>
      <property name="text">
-      <string>Game client running</string>
+      <string>Dota2 running?</string>
      </property>
     </widget>
-    <widget class="QCheckBox" name="checkBox_2">
+    <widget class="QCheckBox" name="cbConnected">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -141,6 +141,9 @@
      </property>
      <property name="text">
       <string>Connected</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="pbStream">
@@ -295,7 +298,7 @@
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>Towers</string>
+       <string>Ancients</string>
       </attribute>
      </widget>
      <widget class="QWidget" name="tab_2">
@@ -317,13 +320,14 @@
      <x>0</x>
      <y>0</y>
      <width>846</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuMenu">
     <property name="title">
      <string>Menu</string>
     </property>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -338,6 +342,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>
